@@ -406,7 +406,18 @@
   .foot-top ul { list-style: none; margin: 0; padding: 0; }
   .foot-bottom {
     margin-top: 48px; padding-top: 20px; border-top: 1px solid rgba(244,239,228,0.12);
-    display: flex; justify-content: space-between; font-size: 12px; color: #b3ad99; flex-wrap: wrap; gap: 12px;
+    display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #b3ad99; flex-wrap: wrap; gap: 12px;
+  }
+  .client-portal {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #8a8e7c; text-decoration: none;
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid rgba(244,239,228,0.14);
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .client-portal:hover {
+    color: var(--amber-soft); border-color: rgba(217,154,43,0.45);
+    background: rgba(217,154,43,0.06);
   }
 
   /* VOICE ORB */
@@ -1931,6 +1942,15 @@ function App() {
           <div className="foot-bottom">
             <span>© 2026 We Fence LLC · FL License #CBC-0000000</span>
             <span className="mono">est. 2014 · Ocala, FL</span>
+            <a
+              href="https://app.gohighlevel.com/v2/location/8IIJDyclaxysv6lPoKrD/opportunities/list"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mono client-portal"
+              title={lang === "es" ? "Panel del cliente — ver leads" : "Client portal — view leads"}
+            >
+              {lang === "es" ? "Panel cliente" : "Client portal"} →
+            </a>
           </div>
         </div>
       </footer>
