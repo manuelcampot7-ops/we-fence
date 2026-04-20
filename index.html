@@ -1,0 +1,1946 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WeFence — Ocala's Trusted Fence Builders</title>
+<meta name="description" content="Vinyl, wood, aluminum, and chain-link fence installation across Marion County, FL. Licensed, insured, and family-owned. Get an instant estimate in 30 seconds." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@1.15.4/dist/livekit-client.umd.min.js" defer crossorigin="anonymous"></script>
+<style>
+  :root {
+    --ink: #12160F;
+    --ink-2: #1E241B;
+    --cream: #F4EFE4;
+    --cream-2: #EBE5D6;
+    --paper: #FAF7EF;
+    --forest: #2C3B26;
+    --forest-deep: #1B2517;
+    --moss: #4A6B3A;
+    --amber: #D99A2B;
+    --amber-soft: #E8B24A;
+    --rust: #A64B2A;
+    --line: rgba(18,22,15,0.12);
+    --line-soft: rgba(18,22,15,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01","cv11";
+    overflow-x: hidden;
+  }
+
+  /* REVEAL ANIMATIONS */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal.d1 { transition-delay: .08s; }
+  .reveal.d2 { transition-delay: .16s; }
+  .reveal.d3 { transition-delay: .24s; }
+  .reveal.d4 { transition-delay: .32s; }
+  .reveal-x { opacity: 0; transform: translateX(-24px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal-x.in { opacity: 1; transform: translateX(0); }
+  .reveal-scale { opacity: 0; transform: scale(.96); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal-scale.in { opacity: 1; transform: scale(1); }
+
+  @keyframes floatIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal-x, .reveal-scale { opacity: 1 !important; transform: none !important; transition: none !important; }
+    * { animation: none !important; }
+  }
+  .serif { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -0.01em; }
+  .mono { font-family: 'Geist Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(14px);
+    background: color-mix(in oklab, var(--paper) 82%, transparent);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 600; letter-spacing: -0.01em; font-size: 18px;
+  }
+  .logo-mark {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: var(--forest);
+    display: grid; place-items: center; color: var(--cream);
+    font-family: 'Instrument Serif', serif; font-size: 20px; font-style: italic;
+    position: relative; overflow: hidden;
+  }
+  .logo-mark::after {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 4px, rgba(244,239,228,0.18) 4px 5px);
+  }
+  .nav-links { display: flex; gap: 28px; font-size: 14px; color: #2a2f24; }
+  .nav-links a { text-decoration: none; opacity: 0.78; }
+  .nav-links a:hover { opacity: 1; }
+  .nav-cta {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .lang-pill {
+    display: inline-flex; border: 1px solid var(--line); border-radius: 999px;
+    font-size: 12px; overflow: hidden;
+  }
+  .lang-pill button {
+    border: 0; background: transparent; padding: 6px 10px; color: #484d40;
+  }
+  .lang-pill button.active { background: var(--ink); color: var(--cream); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px; border-radius: 999px;
+    font-size: 14px; font-weight: 500;
+    border: 1px solid var(--ink); background: var(--ink); color: var(--cream);
+    text-decoration: none; transition: transform .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn.amber { background: var(--amber); border-color: var(--amber); color: #231a05; }
+  .btn.big { padding: 14px 22px; font-size: 15px; }
+
+  /* HERO */
+  .hero {
+    background: var(--forest-deep);
+    color: var(--cream);
+    position: relative; overflow: hidden;
+    padding: 72px 0 96px;
+  }
+  .hero::before {
+    content:""; position: absolute; inset: 0;
+    background:
+      radial-gradient(1200px 500px at 85% -10%, rgba(217,154,43,0.22), transparent 60%),
+      radial-gradient(900px 400px at 10% 110%, rgba(74,107,58,0.35), transparent 60%);
+    pointer-events: none;
+    animation: fadeIn 1.4s ease-out;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(244,239,228,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,239,228,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .hero-grid {
+    position: relative;
+    display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: start;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #cfc8b4; background: rgba(244,239,228,0.06);
+    padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(244,239,228,0.12);
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: #9dd06b; box-shadow: 0 0 10px #9dd06b; }
+  h1.display {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(44px, 7vw, 104px);
+    line-height: 0.98; letter-spacing: -0.02em;
+    margin: 20px 0 18px; font-weight: 400;
+  }
+  h1.display em { font-style: italic; color: var(--amber-soft); display: inline-block; animation: fadeIn 1.2s ease-out .3s both; }
+  .hero p.lead {
+    font-size: 17px; line-height: 1.55; color: #d8d2bf; max-width: 520px;
+  }
+  .hero-meta {
+    margin-top: 28px; display: flex; gap: 28px; flex-wrap: wrap;
+    font-size: 13px; color: #c8c1ac;
+  }
+  .hero-meta .k { color: var(--cream); font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1; display:block; margin-bottom: 4px; }
+  .hero-actions { margin-top: 28px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .hero .btn { border-color: var(--cream); background: var(--cream); color: var(--ink); }
+  .hero .btn.ghost { background: transparent; color: var(--cream); border-color: rgba(244,239,228,0.35); }
+  .hero .btn.amber { background: var(--amber); border-color: var(--amber); color: #231a05; }
+
+  /* CALCULATOR CARD */
+  .calc {
+    background: var(--cream);
+    color: var(--ink);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.5), 0 2px 0 rgba(255,255,255,0.05) inset;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .calc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .calc-title { font-family: 'Instrument Serif', serif; font-size: 26px; letter-spacing: -0.01em; }
+  .calc-sub { font-size: 12px; color: #5c6254; }
+  .tabs { display: flex; gap: 6px; background: rgba(18,22,15,0.06); padding: 4px; border-radius: 999px; }
+  .tabs button { border: 0; background: transparent; padding: 7px 12px; font-size: 12px; border-radius: 999px; color: #3a3f31; }
+  .tabs button.active { background: var(--ink); color: var(--cream); }
+  .field { display: grid; gap: 6px; margin-bottom: 12px; }
+  .field label { font-size: 12px; color: #4a4f41; display:flex; justify-content: space-between; }
+  .field label .hint { color: #8a8e7c; font-weight: 400; }
+  .field input[type="text"], .field input[type="number"], .field select, .field input[type="tel"], .field input[type="email"] {
+    width: 100%; border: 1px solid rgba(18,22,15,0.18); background: var(--paper);
+    border-radius: 10px; padding: 11px 12px; font: inherit; color: inherit;
+    outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--ink); }
+  .slider-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+  .slider-row .val { font-family: 'Geist Mono', monospace; font-size: 14px; background: var(--paper); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: rgba(18,22,15,0.18); border-radius: 999px; outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: var(--ink); border-radius: 50%; cursor: pointer;
+    box-shadow: 0 0 0 4px var(--cream), 0 0 0 5px var(--ink);
+  }
+  .opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .opt {
+    border: 1px solid rgba(18,22,15,0.16); border-radius: 12px; padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    cursor: pointer; background: var(--paper);
+    transition: border-color .15s, background .15s;
+  }
+  .opt .n { font-size: 13px; font-weight: 500; }
+  .opt .p { font-size: 11px; color: #6b6f5e; }
+  .opt.on { border-color: var(--ink); background: #fff; box-shadow: 0 0 0 3px rgba(18,22,15,0.06); }
+  .addon-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+  .toggle { width: 38px; height: 22px; border-radius: 999px; background: rgba(18,22,15,0.2); position: relative; transition: background .2s; flex-shrink: 0; }
+  .toggle::after { content:""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .toggle.on { background: var(--forest); }
+  .toggle.on::after { transform: translateX(16px); }
+
+  .estimate {
+    margin-top: 14px; padding: 16px; border-radius: 14px;
+    background: linear-gradient(180deg, var(--ink) 0%, #181c14 100%);
+    color: var(--cream); position: relative; overflow: hidden;
+  }
+  .estimate::before {
+    content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px;
+    background: radial-gradient(closest-side, rgba(217,154,43,0.35), transparent 70%);
+  }
+  .estimate .label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #c8c1ac; }
+  .estimate .num { font-family: 'Instrument Serif', serif; font-size: 56px; line-height: 1; margin-top: 4px; letter-spacing: -0.02em; }
+  .estimate .num .to { color: var(--amber-soft); font-style: italic; }
+  .estimate .breakdown { display: flex; gap: 18px; margin-top: 14px; font-size: 12px; color: #cfc8b4; flex-wrap: wrap; }
+  .estimate .breakdown span b { color: var(--cream); font-weight: 500; }
+  .estimate .cta-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .estimate .btn { background: var(--amber); color: #231a05; border-color: var(--amber); }
+  .estimate .btn.ghost { background: transparent; color: var(--cream); border-color: rgba(244,239,228,0.35); }
+
+  .trust-strip {
+    margin-top: 14px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: #6b6f5e;
+  }
+  .trust-strip .stars { color: var(--amber); letter-spacing: 2px; }
+
+  /* SECTIONS */
+  section { padding: 96px 0; }
+  .section-head { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: end; margin-bottom: 48px; }
+  .section-head h2 {
+    font-family: 'Instrument Serif', serif; font-size: clamp(40px, 5vw, 64px);
+    line-height: 1.02; letter-spacing: -0.01em; margin: 8px 0 0; font-weight: 400;
+  }
+  .section-head h2 em { font-style: italic; color: var(--moss); }
+  .section-head .label { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #6b6f5e; }
+  .section-head .desc { color: #4a4f41; font-size: 16px; line-height: 1.55; max-width: 460px; }
+
+  /* SERVICES */
+  .svc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .svc {
+    border: 1px solid var(--line);
+    border-radius: 16px; overflow: hidden; background: #fff;
+    display: flex; flex-direction: column;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .svc:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -20px rgba(0,0,0,0.18); }
+  .svc .img {
+    aspect-ratio: 4/3; position: relative; overflow: hidden;
+  }
+  .svc .img::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(18,22,15,0.15));
+    opacity: 0; transition: opacity .3s;
+  }
+  .svc:hover .img::after { opacity: 1; }
+  .svc:hover .img .ph svg,
+  .svc:hover .img .ph img { transform: scale(1.04); }
+  .svc .img .ph svg,
+  .svc .img .ph img { transition: transform .6s ease; }
+  .svc .img .tag {
+    position: absolute; top: 10px; left: 10px; font-size: 11px;
+    background: rgba(18,22,15,0.8); color: var(--cream); padding: 4px 8px; border-radius: 999px;
+    font-family: 'Geist Mono', monospace;
+    z-index: 2;
+  }
+  .svc .body { padding: 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .svc h3 { font-family: 'Instrument Serif', serif; font-size: 26px; margin: 0; font-weight: 400; }
+  .svc p { font-size: 13px; color: #4a4f41; margin: 0; line-height: 1.5; }
+  .svc .price { margin-top: auto; padding-top: 12px; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--forest); }
+
+  /* GALLERY */
+  .gallery {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 220px 220px;
+    gap: 10px;
+  }
+  .gallery .g { border-radius: 14px; overflow: hidden; position: relative; transition: transform .3s ease; }
+  .gallery .g:hover { transform: translateY(-3px); }
+  .gallery .g .ph svg,
+  .gallery .g .ph img { transition: transform .8s ease; }
+  .gallery .g:hover .ph svg,
+  .gallery .g:hover .ph img { transform: scale(1.04); }
+  .gallery .g:nth-child(1) { grid-row: span 2; }
+  .gallery .g .cap {
+    position: absolute; bottom: 10px; left: 10px;
+    background: rgba(18,22,15,0.78); color: var(--cream);
+    padding: 6px 10px; border-radius: 999px; font-size: 11px;
+    font-family: 'Geist Mono', monospace;
+    z-index: 2;
+  }
+
+  /* PROCESS */
+  .process { background: var(--forest-deep); color: var(--cream); }
+  .process h2 em { color: var(--amber-soft); }
+  .process .section-head .label { color: #b3ad99; }
+  .process .section-head .desc { color: #cfc8b4; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .step { border-top: 1px solid rgba(244,239,228,0.18); padding-top: 18px; }
+  .step .n { font-family: 'Instrument Serif', serif; font-size: 48px; line-height: 1; color: var(--amber-soft); font-style: italic; }
+  .step h4 { margin: 8px 0 6px; font-weight: 500; font-size: 17px; letter-spacing: -0.01em; }
+  .step p { margin: 0; font-size: 13px; color: #cfc8b4; line-height: 1.55; }
+
+  /* TESTIMONIALS */
+  .reviews { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .review {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .review .stars { color: var(--amber); letter-spacing: 2px; font-size: 14px; }
+  .review blockquote {
+    margin: 0; font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.25; letter-spacing: -0.01em;
+  }
+  .review .who { display: flex; align-items: center; gap: 10px; margin-top: auto; font-size: 13px; color: #4a4f41; }
+  .review .who .av { width: 34px; height: 34px; border-radius: 50%; background: var(--cream-2); display: grid; place-items: center; font-family: 'Instrument Serif', serif; color: var(--forest); }
+
+  /* AREA */
+  .area { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .cities { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; background: #fff; }
+  .map-card {
+    background: var(--cream); border-radius: 18px; padding: 20px; border: 1px solid var(--line);
+    aspect-ratio: 4/3; position: relative; overflow: hidden;
+  }
+
+  /* CTA / LEAD */
+  .leadcta {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 24px;
+    padding: 48px;
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .leadcta::before {
+    content:""; position: absolute; inset: 0;
+    background:
+      radial-gradient(600px 300px at 90% 10%, rgba(217,154,43,0.25), transparent 60%),
+      radial-gradient(500px 300px at 5% 100%, rgba(74,107,58,0.35), transparent 60%);
+    pointer-events: none;
+  }
+  .leadcta h3 { font-family: 'Instrument Serif', serif; font-size: 56px; line-height: 1.02; margin: 0; letter-spacing: -0.01em; font-weight: 400; }
+  .leadcta h3 em { color: var(--amber-soft); }
+  .leadcta p { color: #cfc8b4; max-width: 420px; }
+  .lead-form {
+    background: rgba(244,239,228,0.06);
+    border: 1px solid rgba(244,239,228,0.18);
+    border-radius: 16px; padding: 18px;
+    position: relative;
+    backdrop-filter: blur(4px);
+  }
+  .lead-form .field input { background: rgba(244,239,228,0.06); border-color: rgba(244,239,228,0.25); color: var(--cream); }
+  .lead-form .field input::placeholder { color: #a39e8b; }
+  .lead-form .field label { color: #cfc8b4; }
+  .lead-form .btn { width: 100%; justify-content: center; background: var(--amber); border-color: var(--amber); color: #231a05; }
+
+  /* FAQ */
+  .faq { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 32px; }
+  details {
+    border-bottom: 1px solid var(--line); padding: 18px 0;
+  }
+  details summary {
+    cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: "+"; font-family: 'Geist Mono', monospace; font-size: 20px; color: #6b6f5e; }
+  details[open] summary::after { content: "–"; }
+  details p { color: #4a4f41; font-size: 14px; line-height: 1.55; margin: 10px 0 0; }
+
+  /* FOOTER */
+  footer {
+    background: var(--forest-deep); color: var(--cream); padding: 64px 0 28px;
+  }
+  .foot-top { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 32px; align-items: start; }
+  .foot-top h5 { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #b3ad99; margin: 0 0 12px; font-weight: 500; }
+  .foot-top a, .foot-top li { display: block; text-decoration: none; color: #cfc8b4; font-size: 14px; line-height: 2; }
+  .foot-top ul { list-style: none; margin: 0; padding: 0; }
+  .foot-bottom {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid rgba(244,239,228,0.12);
+    display: flex; justify-content: space-between; font-size: 12px; color: #b3ad99; flex-wrap: wrap; gap: 12px;
+  }
+
+  /* VOICE ORB */
+  .orb-wrap {
+    position: fixed; bottom: 24px; right: 24px; z-index: 80;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .orb-label {
+    background: rgba(18,22,15,0.92); color: var(--cream);
+    padding: 10px 14px; border-radius: 14px; font-size: 13px;
+    backdrop-filter: blur(6px); border: 1px solid rgba(244,239,228,0.12);
+    max-width: 260px; line-height: 1.35;
+    opacity: 0; transform: translateX(8px); transition: all .28s cubic-bezier(.22,1,.36,1);
+    pointer-events: none;
+  }
+  .orb-label .k { font-family: 'Geist Mono', monospace; font-size: 10px; color: #b3ad99; display:block; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+  .orb-label .status-row {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 6px; padding-top: 6px;
+    border-top: 1px solid rgba(244,239,228,0.1);
+    font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .orb-label .status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #8a8e7c; flex-shrink: 0;
+  }
+  .orb-wrap:hover .orb-label,
+  .orb-wrap[data-state="connecting"] .orb-label,
+  .orb-wrap[data-state="active"] .orb-label,
+  .orb-wrap[data-state="disconnecting"] .orb-label { opacity: 1; transform: translateX(0); }
+
+  .orb-wrap[data-state="connecting"] .status-dot { background: var(--amber-soft); animation: dotPulse 1.1s ease-in-out infinite; }
+  .orb-wrap[data-state="active"] .status-dot { background: #9dd06b; box-shadow: 0 0 10px #9dd06b; animation: dotPulse 1.6s ease-in-out infinite; }
+  .orb-wrap[data-state="disconnecting"] .status-dot { background: var(--rust); animation: dotPulse 0.9s ease-in-out infinite; }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.35; transform: scale(0.8); }
+  }
+
+  /* Error toast */
+  .orb-err {
+    margin-top: 6px; padding: 6px 10px; border-radius: 10px;
+    background: rgba(166,75,42,0.2); border: 1px solid rgba(166,75,42,0.4);
+    color: #ffbfa8; font-size: 11px;
+  }
+
+  /* Base orb */
+  .orb {
+    --audio-level: 0;
+    width: 76px; height: 76px; border-radius: 50%; cursor: pointer;
+    position: relative; flex-shrink: 0;
+    background: radial-gradient(circle at 35% 30%, #f5e7bb 0%, var(--amber) 32%, #7a4f10 68%, #2a1a04 100%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.3) inset,
+      0 0 30px rgba(217,154,43,0.55),
+      0 0 80px rgba(217,154,43,0.35),
+      0 20px 40px -10px rgba(0,0,0,0.5);
+    animation: orbPulse 3.2s ease-in-out infinite, orbBreathe 6.8s ease-in-out infinite;
+    overflow: visible;
+    border: 0;
+    transition: background .5s ease, box-shadow .35s ease, filter .3s ease;
+  }
+  .orb:hover { filter: brightness(1.12); }
+  .orb:disabled { cursor: wait; }
+  .orb::before {
+    content: ""; position: absolute; inset: -8px; border-radius: 50%;
+    border: 1px solid rgba(217,154,43,0.5);
+    animation: ring 3.2s ease-out infinite;
+    pointer-events: none;
+  }
+  .orb::after {
+    content:""; position: absolute; inset: -18px; border-radius: 50%;
+    border: 1px solid rgba(217,154,43,0.25);
+    animation: ring 3.2s ease-out infinite .6s;
+    pointer-events: none;
+  }
+  .orb .ring-3 {
+    position: absolute; inset: -28px; border-radius: 50%;
+    border: 1px solid rgba(217,154,43,0.12);
+    animation: ring 3.2s ease-out infinite 1.2s;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .orb-wrap:hover .orb .ring-3 { opacity: 1; }
+  .orb .wave {
+    position: absolute; inset: -4px; border-radius: 50%;
+    border: 2px solid rgba(255,200,140,0.6);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1);
+    transition: opacity .3s ease;
+  }
+  .orb .core {
+    position: absolute; inset: 10px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, rgba(255,245,215,0.95), rgba(217,154,43,0.2) 45%, transparent 70%);
+    mix-blend-mode: screen;
+    animation: coreShift 4s ease-in-out infinite alternate;
+  }
+  .orb .mic {
+    position: absolute; inset: 0; display: grid; place-items: center; color: #2a1a04;
+    transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .2s ease;
+  }
+  .orb .spinner {
+    position: absolute; inset: -10px; border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--cream);
+    border-right-color: rgba(217,154,43,0.6);
+    opacity: 0;
+    pointer-events: none;
+    animation: orbSpin 0.9s linear infinite;
+  }
+
+  /* Connecting state */
+  .orb-wrap[data-state="connecting"] .orb {
+    animation: orbPulse 1.2s ease-in-out infinite;
+  }
+  .orb-wrap[data-state="connecting"] .orb .spinner { opacity: 1; }
+  .orb-wrap[data-state="connecting"] .orb .mic { transform: scale(0.82); opacity: 0.45; }
+
+  /* Active state — switches to hot coral/red palette with audio-reactive glow */
+  .orb-wrap[data-state="active"] .orb {
+    background: radial-gradient(circle at 35% 30%, #ffeacc 0%, #ff8c42 32%, #9a2f07 68%, #2a1004 100%);
+    animation: orbPulseActive 1.9s ease-in-out infinite;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.4) inset,
+      0 0 35px rgba(255,140,66,0.75),
+      0 0 calc(60px + var(--audio-level, 0) * 110px) rgba(255,140,66,0.5),
+      0 0 0 calc(3px + var(--audio-level, 0) * 18px) rgba(255,140,66,0.18),
+      0 20px 40px -10px rgba(0,0,0,0.5);
+  }
+  .orb-wrap[data-state="active"] .orb::before {
+    border-color: rgba(255,140,66,0.6);
+    animation: ring 1.7s ease-out infinite;
+    inset: -8px;
+  }
+  .orb-wrap[data-state="active"] .orb::after {
+    border-color: rgba(255,140,66,0.3);
+    animation: ring 1.7s ease-out infinite .4s;
+  }
+  .orb-wrap[data-state="active"] .orb .ring-3 {
+    opacity: 1;
+    border-color: rgba(255,140,66,0.15);
+    animation: ring 1.7s ease-out infinite .8s;
+  }
+  .orb-wrap[data-state="active"] .orb .wave {
+    opacity: 1;
+    animation: wavePulse 1.4s ease-out infinite;
+  }
+  .orb-wrap[data-state="active"] .orb .mic { color: rgba(255,255,255,0.96); }
+
+  /* Disconnecting — desaturated fade */
+  .orb-wrap[data-state="disconnecting"] .orb {
+    filter: grayscale(0.35) brightness(0.85);
+    animation: orbPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes orbPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50%      { transform: scale(1.04); filter: brightness(1.12); }
+  }
+  @keyframes orbPulseActive {
+    0%, 100% { transform: scale(calc(1 + var(--audio-level, 0) * 0.05)); filter: brightness(1.08); }
+    50%      { transform: scale(calc(1.05 + var(--audio-level, 0) * 0.08)); filter: brightness(1.3); }
+  }
+  @keyframes orbBreathe {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50%      { filter: hue-rotate(-4deg); }
+  }
+  @keyframes ring {
+    0%   { transform: scale(0.9); opacity: 0.9; }
+    100% { transform: scale(1.55); opacity: 0; }
+  }
+  @keyframes wavePulse {
+    0%   { transform: scale(1); opacity: 0.85; }
+    100% { transform: scale(2.0); opacity: 0; }
+  }
+  @keyframes coreShift {
+    0%   { transform: translate(-2px, -1px); }
+    100% { transform: translate(2px, 2px); }
+  }
+  @keyframes orbSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* PLACEHOLDER IMAGES (stripes + label, real photo when src is provided) */
+  .ph {
+    position: relative; width: 100%; height: 100%;
+    background: #d9d3bf;
+    overflow: hidden;
+  }
+  .ph.dark { background: #3b4433; }
+  .ph svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ph .lbl {
+    position: absolute; left: 12px; bottom: 12px; right: 12px;
+    font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(18,22,15,0.65);
+  }
+  .ph.dark .lbl { color: rgba(244,239,228,0.65); }
+
+  /* === ENHANCED ANIMATIONS === */
+
+  /* Scroll progress bar */
+  .scroll-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--amber) 0%, var(--amber-soft) 50%, var(--moss) 100%);
+    z-index: 999; pointer-events: none;
+    box-shadow: 0 0 14px rgba(217,154,43,0.55);
+    transition: width .12s linear;
+  }
+
+  /* Cinematic blur-reveal variant */
+  .reveal-blur { opacity: 0; transform: translateY(28px); filter: blur(14px); transition: opacity 1.1s cubic-bezier(.22,1,.36,1), transform 1.1s cubic-bezier(.22,1,.36,1), filter 1.1s cubic-bezier(.22,1,.36,1); }
+  .reveal-blur.in { opacity: 1; transform: translateY(0); filter: blur(0); }
+
+  /* Hero mouse-follow spotlight */
+  .hero { --mx: 70%; --my: 10%; }
+  .hero .spotlight {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(620px 420px at var(--mx) var(--my), rgba(232,178,74,0.22), transparent 58%);
+    mix-blend-mode: screen;
+    transition: background .35s ease-out;
+    z-index: 0;
+  }
+  .hero-grid { z-index: 1; }
+
+  /* Animated grid pan in hero */
+  .hero::after { animation: gridPan 42s linear infinite; }
+  @keyframes gridPan {
+    from { background-position: 0 0, 0 0; }
+    to   { background-position: 60px 60px, 60px 60px; }
+  }
+
+  /* Glow pulse on amber italic words & step numbers */
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 22px rgba(232,178,74,0.22), 0 0 52px rgba(232,178,74,0.1); }
+    50%      { text-shadow: 0 0 38px rgba(232,178,74,0.55), 0 0 78px rgba(232,178,74,0.22); }
+  }
+  h1.display em,
+  .leadcta h3 em,
+  .process h2 em { animation: glowPulse 4.6s ease-in-out infinite; }
+
+  /* Gradient-shine on process step counters */
+  .step .n {
+    background: linear-gradient(120deg, var(--amber-soft) 0%, #f5e7bb 35%, var(--amber) 65%, var(--amber-soft) 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: stepShine 7s linear infinite;
+  }
+  @keyframes stepShine {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  /* Sticky nav shrinks + solidifies on scroll */
+  .nav { transition: background .3s ease, backdrop-filter .3s ease, box-shadow .3s ease; }
+  .nav .nav-inner { transition: height .3s cubic-bezier(.2,.8,.2,1); }
+  .nav .logo-mark { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+  .nav.scrolled {
+    background: color-mix(in oklab, var(--paper) 94%, transparent);
+    box-shadow: 0 10px 30px -18px rgba(0,0,0,0.18);
+  }
+  .nav.scrolled .nav-inner { height: 56px; }
+  .nav.scrolled .logo-mark { transform: scale(.92) rotate(-3deg); }
+
+  /* Magnetic big buttons */
+  .btn.big { transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, background-color .2s ease, color .2s ease, border-color .2s ease; position: relative; overflow: hidden; }
+  .btn.amber.big:hover { box-shadow: 0 16px 50px -12px rgba(217,154,43,0.6), 0 0 0 1px rgba(217,154,43,0.35) inset; }
+  .btn.big::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+    transform: translateX(-120%);
+    transition: transform .7s cubic-bezier(.2,.8,.2,1);
+    pointer-events: none;
+  }
+  .btn.big:hover::before { transform: translateX(120%); }
+
+  /* 3D tilt container for cards */
+  .svc, .review {
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+    transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
+    will-change: transform;
+  }
+  .svc:hover { box-shadow: 0 40px 80px -30px rgba(0,0,0,0.28); }
+  .review { transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease; }
+  .review:hover { box-shadow: 0 30px 60px -25px rgba(0,0,0,0.2); border-color: rgba(18,22,15,0.22); }
+
+  /* Calculator number pop on value change */
+  .estimate .num {
+    display: inline-block;
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .estimate .num.flash { animation: numPop .55s cubic-bezier(.22,1.4,.36,1); }
+  @keyframes numPop {
+    0%   { transform: scale(.95); filter: blur(3px); opacity: .55; }
+    55%  { transform: scale(1.03); filter: blur(0); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  /* Option card subtle lift */
+  .opt { transition: transform .2s ease, border-color .15s, background .15s, box-shadow .2s ease; }
+  .opt:hover { transform: translateY(-2px); }
+  .opt.on { transform: translateY(-2px); }
+
+  /* Toggle glow when on */
+  .toggle.on { box-shadow: 0 0 0 4px rgba(74,107,58,0.15); }
+
+  /* Gallery image zoom + slow drift */
+  .gallery .g .ph img {
+    transform: scale(1.06);
+    transition: transform 1.1s cubic-bezier(.22,.8,.36,1), filter .5s ease;
+  }
+  .gallery .g:hover .ph img { transform: scale(1.15); filter: saturate(1.08) contrast(1.02); }
+
+  /* Service card image zoom */
+  .svc .img .ph img {
+    transform: scale(1.02);
+    transition: transform .8s cubic-bezier(.22,.8,.36,1), filter .4s ease;
+  }
+  .svc:hover .img .ph img { transform: scale(1.08); filter: saturate(1.1); }
+
+  /* Chips interactive */
+  .chip { transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease; cursor: default; }
+  .chip:hover { transform: translateY(-2px); background: var(--forest); border-color: var(--forest); color: var(--cream); }
+
+  /* Footer link underline slide */
+  .foot-top a { position: relative; display: inline-block; }
+  .foot-top a::after {
+    content: ""; position: absolute; left: 0; bottom: 2px;
+    width: 0; height: 1px; background: currentColor;
+    transition: width .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .foot-top a:hover::after { width: 100%; }
+
+  /* Details expand smoothness */
+  details[open] p { animation: slideDown .4s cubic-bezier(.22,1,.36,1); }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Smooth anchor offset for sticky nav */
+  html { scroll-padding-top: 80px; }
+
+  /* Focus ring polish */
+  .btn:focus-visible, .lang-pill button:focus-visible,
+  input:focus-visible, select:focus-visible, textarea:focus-visible,
+  .opt:focus-visible, button.orb:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 3px;
+  }
+
+  /* Orb tap ripple */
+  .orb:active { animation: orbTap .35s cubic-bezier(.22,.8,.36,1); }
+  @keyframes orbTap {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(0.94); }
+    100% { transform: scale(1); }
+  }
+
+  /* Review avatar pop */
+  .review .who .av { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+  .review:hover .who .av { transform: rotate(-6deg) scale(1.06); }
+
+  /* Map pulse (already SVG-animated) + card float */
+  .map-card { transition: transform .5s cubic-bezier(.22,.8,.36,1), box-shadow .4s ease; }
+  .map-card:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -25px rgba(0,0,0,0.18); }
+
+  /* Logo mark shimmer on hover */
+  .logo-mark { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+  .logo:hover .logo-mark { transform: rotate(-6deg) scale(1.06); }
+
+  /* Reduced motion: disable extras */
+  @media (prefers-reduced-motion: reduce) {
+    h1.display em, .leadcta h3 em, .process h2 em, .step .n,
+    .hero::after, .scroll-progress { animation: none !important; }
+    .btn.big::before { display: none !important; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 960px) {
+    .container { padding: 0 20px; }
+    .hero { padding: 48px 0 64px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+    .hero-meta { gap: 18px; }
+    section { padding: 64px 0; }
+    .section-head { grid-template-columns: 1fr; gap: 12px; margin-bottom: 32px; }
+    .svc-grid { grid-template-columns: repeat(2, 1fr); }
+    .gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 200px 200px 200px; }
+    .gallery .g:nth-child(1) { grid-column: span 2; grid-row: span 1; }
+    .steps { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .reviews { grid-template-columns: 1fr; }
+    .area { grid-template-columns: 1fr; gap: 28px; }
+    .leadcta { grid-template-columns: 1fr; padding: 32px; }
+    .leadcta h3 { font-size: 40px; }
+    .foot-top { grid-template-columns: 1fr 1fr; }
+    .faq { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .orb { width: 64px; height: 64px; }
+    .orb-wrap { bottom: 16px; right: 16px; }
+  }
+  @media (max-width: 560px) {
+    .container { padding: 0 16px; }
+    .nav-inner { height: 60px; }
+    .logo span { font-size: 16px; }
+    .nav .btn { padding: 8px 12px; font-size: 13px; }
+    .hero { padding: 36px 0 52px; }
+    h1.display { font-size: clamp(38px, 11vw, 64px); }
+    .hero .lead { font-size: 15px; }
+    .hero-actions .btn.big { padding: 12px 18px; font-size: 14px; }
+    .hero-meta { gap: 14px; font-size: 12px; }
+    .hero-meta .k { font-size: 20px; }
+    .calc { padding: 16px; border-radius: 14px; }
+    .calc-title { font-size: 22px; }
+    .estimate .num { font-size: 44px; }
+    .opts { grid-template-columns: repeat(2, 1fr); }
+    section { padding: 48px 0; }
+    .svc-grid { grid-template-columns: 1fr; }
+    .svc h3 { font-size: 24px; }
+    .gallery { grid-template-columns: 1fr; grid-template-rows: repeat(5, 180px); gap: 8px; }
+    .gallery .g:nth-child(1) { grid-column: span 1; }
+    .steps { grid-template-columns: 1fr; }
+    .step .n { font-size: 40px; }
+    .leadcta { padding: 24px; border-radius: 18px; }
+    .leadcta h3 { font-size: 34px; }
+    .foot-top { grid-template-columns: 1fr; gap: 24px; }
+    details summary { font-size: 18px; }
+    .review blockquote { font-size: 19px; }
+    .orb { width: 58px; height: 58px; }
+    .orb-label { display: none; }
+    .estimate .cta-row .btn { width: 100%; justify-content: center; }
+    .section-head h2 { font-size: clamp(32px, 8vw, 44px); }
+  }
+</style>
+</head>
+<body>
+
+<script>
+  window.__TWEAKS__ = {
+    "pricePerFoot": 22,
+    "gatePrice": 300,
+    "defaultLanguage": "en",
+    "phone": "(352) 555-0199",
+    "email": "hello@we-fence.com"
+  };
+</script>
+
+<div id="app"></div>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+const T = {
+  en: {
+    nav: { services: "Services", calculator: "Estimator", work: "Our Work", process: "Process", reviews: "Reviews", contact: "Contact", quote: "Free Quote" },
+    hero: {
+      eyebrow: "Ocala, FL · Licensed & Insured · Family-owned",
+      title: ["Fences built ", "right", " the first time."],
+      lead: "Vinyl, wood, aluminum, and chain-link — installed across Marion County by a crew that shows up, finishes clean, and stands behind the work.",
+      ctaPrimary: "Get a Free Estimate",
+      ctaSecondary: "See Our Work",
+      meta: [
+        { k: "10+", v: "Years building fences in Central Florida" },
+        { k: "500+", v: "Yards fenced across Ocala & beyond" },
+        { k: "5.0★", v: "Average rating on Google & Facebook" },
+      ],
+    },
+    calc: {
+      title: "Instant Estimate",
+      sub: "Real pricing. No sales call required.",
+      tabs: ["By length", "By property"],
+      length: "Linear feet of fence",
+      lengthHint: "Perimeter, not square feet",
+      material: "Material",
+      materials: [
+        { id: "vinyl", name: "Vinyl", note: "Most popular", mult: 1.0 },
+        { id: "wood", name: "Wood Privacy", note: "Classic look", mult: 0.92 },
+        { id: "aluminum", name: "Aluminum", note: "Premium", mult: 1.18 },
+        { id: "chain", name: "Chain-Link", note: "Budget-friendly", mult: 0.68 },
+      ],
+      gate: "Add a gate",
+      gateHint: "Standard 4ft walk-gate · +$300",
+      estimate: "Estimated range",
+      breakdown: ["Base fence", "Gate", "Rate"],
+      ctaLock: "Lock in this price",
+      ctaCall: "Talk to a builder",
+      disclaimer: "Estimates include standard install on level ground. Final quote after site visit.",
+      trust: "500+ estimates delivered in 2025",
+    },
+    services: {
+      label: "What we build",
+      title: ["Four materials. ", "One crew that cares.", ""],
+      desc: "From privacy vinyl to backyard chain-link — every fence gets the same level of craftsmanship and the same 5-year workmanship guarantee.",
+      items: [
+        { tag: "VINYL · 01", name: "Vinyl Privacy", p: "Low-maintenance, UV-stable, 6ft standard. Our most-requested residential fence.", price: "from $22/ft" },
+        { tag: "WOOD · 02", name: "Wood Privacy", p: "Pressure-treated pine or cedar. Classic Ocala look, built to last a decade+.", price: "from $20/ft" },
+        { tag: "ALU · 03", name: "Aluminum Ornamental", p: "Pool-code compliant. Powder-coated black, bronze, or white.", price: "from $26/ft" },
+        { tag: "CHAIN · 04", name: "Chain-Link", p: "Galvanized or vinyl-coated. For pets, perimeters, and commercial lots.", price: "from $15/ft" },
+      ],
+    },
+    gallery: {
+      label: "Recent work",
+      title: ["Built in ", "Ocala.", " Stress-tested by Florida."],
+      desc: "A slice of the last few months. Every install is photographed on completion — we'll send yours for your records.",
+      caps: ["6ft vinyl privacy · SE Ocala", "Black aluminum · Pool code · Belleview", "Wood privacy · Dunnellon", "Chain-link · Commercial · Silver Springs", "White vinyl · Horse farm gate"],
+    },
+    process: {
+      label: "How it works",
+      title: ["From call to ", "completion", ", in about 10 days."],
+      desc: "No high-pressure sales, no hidden fees. Here's exactly what happens after you hit the estimate button.",
+      steps: [
+        { n: "01", h: "Instant estimate", p: "Use the calculator above. Takes 30 seconds and gives you a real range." },
+        { n: "02", h: "Free site visit", p: "We come measure, mark utilities, and confirm the final number — usually within 48 hours." },
+        { n: "03", h: "Permits & scheduling", p: "We pull permits and call 811. You pick your install week." },
+        { n: "04", h: "Install & clean-up", p: "1–3 day install depending on size. We haul every scrap of debris off your property." },
+      ],
+    },
+    reviews: {
+      label: "What neighbors say",
+      title: ["The kind of word-of-mouth ", "we work for", "."],
+      desc: "Pulled straight from Google and Facebook. No cherry-picking.",
+      items: [
+        { stars: 5, q: "Showed up when they said, finished a day early, and the yard was cleaner than when they got here. Price matched the online estimate to the dollar.", name: "Marcus T.", loc: "Ocala, FL", av: "M" },
+        { stars: 5, q: "Got three quotes. WeFence was the most transparent and the only one that answered the phone on a Saturday. The vinyl fence looks unreal.", name: "Jessica R.", loc: "Belleview, FL", av: "J" },
+        { stars: 5, q: "They rebuilt 200ft of storm-damaged wood fence in two days. Crew was professional, bilingual, and actually listened to what we wanted.", name: "Daniel P.", loc: "Summerfield, FL", av: "D" },
+      ],
+    },
+    area: {
+      label: "Service area",
+      title: ["We build across ", "Marion County", " and nearby."],
+      desc: "Ocala is home base — but if you're within about 40 miles, we're there. Not sure? Send us your address for a quick yes/no.",
+      cities: ["Ocala", "Belleview", "Summerfield", "Silver Springs", "Dunnellon", "The Villages", "Citra", "Reddick", "Marion Oaks", "Anthony", "Fort McCoy", "Weirsdale"],
+    },
+    leadcta: {
+      title: ["Let's build ", "yours", " next."],
+      desc: "Send us your details and a rough idea of the job. We'll text back with a same-day estimate and a time for the site visit.",
+      form: { name: "Full name", phone: "Phone", email: "Email", about: "What are you fencing in?", send: "Request my estimate", ok: "Got it — we'll text you within the hour." },
+    },
+    faq: {
+      label: "Common questions",
+      title: ["Straight answers ", "before", " you call."],
+      items: [
+        { q: "Are you licensed and insured?", a: "Yes — fully licensed in Florida and carry $2M general liability. We can send proof before any work starts." },
+        { q: "Do you pull permits?", a: "Always. Permit fees are included in the quoted price for most of Marion County." },
+        { q: "How long does install take?", a: "Most residential fences (under 300 linear feet) are installed in 1–3 days once materials arrive." },
+        { q: "What warranty do you offer?", a: "5-year workmanship warranty plus manufacturer warranties on materials (up to lifetime on vinyl)." },
+        { q: "Do you do repairs?", a: "Yes — storm damage, leaning posts, gate repairs, and section replacements. Call us." },
+        { q: "Hablan español?", a: "Sí — todo nuestro equipo es bilingüe. Cambia el idioma arriba a la derecha." },
+      ],
+    },
+    orb: { title: "Talk to our AI estimator", sub: "24/7 · Voice-enabled · Tap to start" },
+  },
+  es: {
+    nav: { services: "Servicios", calculator: "Cotizador", work: "Trabajos", process: "Proceso", reviews: "Reseñas", contact: "Contacto", quote: "Cotiza Gratis" },
+    hero: {
+      eyebrow: "Ocala, FL · Licencia & Seguro · Familiar",
+      title: ["Cercas hechas ", "bien", " desde el primer día."],
+      lead: "Vinilo, madera, aluminio y malla — instalación en todo el condado de Marion por un equipo que llega a tiempo, termina limpio y respalda su trabajo.",
+      ctaPrimary: "Cotiza Gratis",
+      ctaSecondary: "Ver Trabajos",
+      meta: [
+        { k: "10+", v: "Años construyendo cercas en Florida Central" },
+        { k: "500+", v: "Propiedades cercadas en Ocala y alrededores" },
+        { k: "5.0★", v: "Calificación promedio en Google y Facebook" },
+      ],
+    },
+    calc: {
+      title: "Cotización Instantánea",
+      sub: "Precio real. Sin llamadas de ventas.",
+      tabs: ["Por pies lineales", "Por propiedad"],
+      length: "Pies lineales de cerca",
+      lengthHint: "Perímetro, no pies cuadrados",
+      material: "Material",
+      materials: [
+        { id: "vinyl", name: "Vinilo", note: "Más popular", mult: 1.0 },
+        { id: "wood", name: "Madera", note: "Look clásico", mult: 0.92 },
+        { id: "aluminum", name: "Aluminio", note: "Premium", mult: 1.18 },
+        { id: "chain", name: "Malla", note: "Económico", mult: 0.68 },
+      ],
+      gate: "Agregar portón",
+      gateHint: "Portón peatonal 4ft · +$300",
+      estimate: "Rango estimado",
+      breakdown: ["Cerca base", "Portón", "Tarifa"],
+      ctaLock: "Reservar este precio",
+      ctaCall: "Hablar con el instalador",
+      disclaimer: "Estimado incluye instalación estándar en terreno nivelado. Cotización final tras visita.",
+      trust: "500+ estimados entregados en 2025",
+    },
+    services: {
+      label: "Lo que construimos",
+      title: ["Cuatro materiales. ", "Un solo equipo que se preocupa.", ""],
+      desc: "De vinilo de privacidad a malla ciclónica — cada cerca recibe el mismo nivel de calidad y la misma garantía de 5 años en mano de obra.",
+      items: [
+        { tag: "VINILO · 01", name: "Vinilo Privacidad", p: "Bajo mantenimiento, resistente UV, 6ft estándar. Nuestro más solicitado.", price: "desde $22/ft" },
+        { tag: "MADERA · 02", name: "Madera Privacidad", p: "Pino tratado o cedro. El look clásico de Ocala, diseñado para durar una década+.", price: "desde $20/ft" },
+        { tag: "ALU · 03", name: "Aluminio Ornamental", p: "Cumple código de pileta. Pintura en polvo negro, bronce o blanco.", price: "desde $26/ft" },
+        { tag: "MALLA · 04", name: "Malla Ciclónica", p: "Galvanizada o con vinilo. Para mascotas, perímetros y comercios.", price: "desde $15/ft" },
+      ],
+    },
+    gallery: {
+      label: "Trabajos recientes",
+      title: ["Construidas en ", "Ocala.", " Probadas por Florida."],
+      desc: "Una muestra de los últimos meses. Cada instalación se fotografía al terminar — te enviamos las tuyas para tus archivos.",
+      caps: ["Vinilo 6ft · SE Ocala", "Aluminio negro · Código pileta · Belleview", "Madera privacidad · Dunnellon", "Malla · Comercial · Silver Springs", "Vinilo blanco · Rancho de caballos"],
+    },
+    process: {
+      label: "Cómo funciona",
+      title: ["De llamada a ", "instalación", ", en unos 10 días."],
+      desc: "Sin presión de ventas, sin costos ocultos. Esto es exactamente lo que sucede después de cotizar.",
+      steps: [
+        { n: "01", h: "Estimado instantáneo", p: "Usa la calculadora. Toma 30 segundos y te da un rango real." },
+        { n: "02", h: "Visita gratis", p: "Vamos a medir, marcar servicios, y confirmar el número final — en 48 horas." },
+        { n: "03", h: "Permisos y fechas", p: "Tramitamos permisos y llamamos al 811. Tú eliges la semana de instalación." },
+        { n: "04", h: "Instalación y limpieza", p: "1–3 días según el tamaño. Nos llevamos toda la basura de tu propiedad." },
+      ],
+    },
+    reviews: {
+      label: "Lo que dicen los vecinos",
+      title: ["El tipo de recomendación ", "que nos ganamos", "."],
+      desc: "Directamente de Google y Facebook. Sin selecciones.",
+      items: [
+        { stars: 5, q: "Llegaron cuando dijeron, terminaron un día antes, y el patio quedó más limpio de como lo encontraron. El precio fue exactamente el del estimado en línea.", name: "Marcus T.", loc: "Ocala, FL", av: "M" },
+        { stars: 5, q: "Pedí tres cotizaciones. WeFence fue el más transparente y el único que contestó el sábado. La cerca de vinilo quedó increíble.", name: "Jessica R.", loc: "Belleview, FL", av: "J" },
+        { stars: 5, q: "Reconstruyeron 200ft de cerca de madera dañada por tormenta en dos días. Equipo profesional, bilingüe, y realmente escuchó lo que queríamos.", name: "Daniel P.", loc: "Summerfield, FL", av: "D" },
+      ],
+    },
+    area: {
+      label: "Área de servicio",
+      title: ["Construimos en ", "Marion County", " y alrededores."],
+      desc: "Ocala es nuestra base — pero si estás a menos de 40 millas, vamos. ¿No estás seguro? Envía tu dirección para un sí/no rápido.",
+      cities: ["Ocala", "Belleview", "Summerfield", "Silver Springs", "Dunnellon", "The Villages", "Citra", "Reddick", "Marion Oaks", "Anthony", "Fort McCoy", "Weirsdale"],
+    },
+    leadcta: {
+      title: ["Construyamos ", "la tuya", " ahora."],
+      desc: "Envíanos tus datos y una idea del trabajo. Te enviamos un texto el mismo día con el estimado y la fecha de visita.",
+      form: { name: "Nombre completo", phone: "Teléfono", email: "Email", about: "¿Qué vas a cercar?", send: "Pedir mi estimado", ok: "Recibido — te enviaremos un texto en la próxima hora." },
+    },
+    faq: {
+      label: "Preguntas frecuentes",
+      title: ["Respuestas claras ", "antes", " de llamar."],
+      items: [
+        { q: "¿Tienen licencia y seguro?", a: "Sí — licencia completa en Florida y seguro de responsabilidad de $2M. Te enviamos comprobantes antes de empezar." },
+        { q: "¿Tramitan los permisos?", a: "Siempre. Los costos de permisos están incluidos en el precio cotizado para la mayoría de Marion County." },
+        { q: "¿Cuánto tarda la instalación?", a: "La mayoría de cercas residenciales (menos de 300 pies) se instalan en 1–3 días una vez llegan los materiales." },
+        { q: "¿Qué garantía ofrecen?", a: "5 años en mano de obra más garantías del fabricante en materiales (hasta vitalicia en vinilo)." },
+        { q: "¿Hacen reparaciones?", a: "Sí — daños por tormenta, postes inclinados, portones, y reemplazo de secciones. Llámanos." },
+        { q: "Do you speak English?", a: "Yes — our entire team is bilingual. Switch the language at the top right." },
+      ],
+    },
+    orb: { title: "Habla con nuestro asistente AI", sub: "24/7 · Por voz · Toca para empezar" },
+  },
+};
+
+// SVG placeholder tile — stripes in forest/cream palette, resembling fence slats.
+// When `src` is provided, renders a real photo instead.
+function Placeholder({ variant = "vinyl", label, dark, src, alt }) {
+  if (src) {
+    return (
+      <div className={`ph ${dark ? "dark" : ""}`}>
+        <img src={src} alt={alt || label} loading="lazy" />
+      </div>
+    );
+  }
+  const palettes = {
+    vinyl: { bg: "#eae3cf", stripe: "#d4cbb0", accent: "#8a9478" },
+    wood: { bg: "#b69876", stripe: "#997a54", accent: "#4a3b2a" },
+    aluminum: { bg: "#2a2f25", stripe: "#1a1f15", accent: "#4a6b3a" },
+    chain: { bg: "#d1cdbe", stripe: "#a8a392", accent: "#3b4433" },
+    sky: { bg: "#3b4433", stripe: "#2a3323", accent: "#d99a2b" },
+  };
+  const p = palettes[variant] || palettes.vinyl;
+  return (
+    <div className={`ph ${dark ? "dark" : ""}`} style={{ background: p.bg }}>
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden>
+        <defs>
+          <pattern id={`stripe-${variant}`} width="18" height="300" patternUnits="userSpaceOnUse">
+            <rect width="14" height="300" fill={p.stripe} />
+            <rect x="14" width="4" height="300" fill={p.bg} />
+          </pattern>
+          <linearGradient id={`g-${variant}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={p.bg} stopOpacity="0" />
+            <stop offset="1" stopColor="#000" stopOpacity="0.25" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="300" fill={p.bg} />
+        <rect y="80" width="400" height="180" fill={`url(#stripe-${variant})`} opacity="0.55" />
+        <rect y="80" width="400" height="6" fill={p.accent} opacity="0.6" />
+        <rect y="220" width="400" height="6" fill={p.accent} opacity="0.5" />
+        <rect y="260" width="400" height="40" fill="#000" opacity="0.18" />
+        <rect width="400" height="300" fill={`url(#g-${variant})`} />
+      </svg>
+      <div className="lbl">[ {label} ]</div>
+    </div>
+  );
+}
+
+// Map each service and gallery slot to a real photo in /images.
+const SERVICE_IMAGES = [
+  "images/fence-gallery-1.png",
+  "images/fence-gallery-2.jpg",
+  "images/fence-gallery-3.jpg",
+  "images/fence-gallery-4.jpg",
+];
+const GALLERY_IMAGES = [
+  "images/fence-hero.png",
+  "images/fence-gallery-5.jpg",
+  "images/fence-gallery-6.jpg",
+  "images/fence-gallery-3.jpg",
+  "images/fence-gallery-2.jpg",
+];
+
+function ScrollProgress() {
+  const [w, setW] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setW(h > 0 ? (window.scrollY / h) * 100 : 0);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return <div className="scroll-progress" style={{ width: w + "%" }} />;
+}
+
+function CountUp({ value, duration = 1600 }) {
+  const ref = useRef(null);
+  const started = useRef(false);
+  const [display, setDisplay] = useState(0);
+  const match = String(value).match(/^([\d.]+)(.*)$/);
+  const target = match ? parseFloat(match[1]) : 0;
+  const suffix = match ? match[2] : "";
+  const decimals = match ? (match[1].split(".")[1] || "").length : 0;
+
+  useEffect(() => {
+    started.current = false;
+    setDisplay(0);
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started.current) {
+        started.current = true;
+        const start = performance.now();
+        const tick = (now) => {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          setDisplay(target * eased);
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.4 });
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+  }, [target, duration, value]);
+
+  const shown = target === 0 ? "0" : display.toFixed(decimals);
+  return <span ref={ref}>{shown}{suffix}</span>;
+}
+
+function Calculator({ t, tweaks }) {
+  const [feet, setFeet] = useState(150);
+  const [matId, setMatId] = useState("vinyl");
+  const [gate, setGate] = useState(true);
+  const numRef = useRef(null);
+  const prevRange = useRef("");
+
+  const mat = t.calc.materials.find(m => m.id === matId);
+  const base = feet * tweaks.pricePerFoot * mat.mult;
+  const gateCost = gate ? tweaks.gatePrice : 0;
+  const total = Math.round(base + gateCost);
+  const low = Math.round(total * 0.94);
+  const high = Math.round(total * 1.08);
+
+  const fmt = n => "$" + n.toLocaleString();
+
+  useEffect(() => {
+    const cur = `${low}-${high}`;
+    const el = numRef.current;
+    if (el && prevRange.current && prevRange.current !== cur) {
+      el.classList.remove("flash");
+      // force reflow to restart the animation
+      void el.offsetWidth;
+      el.classList.add("flash");
+    }
+    prevRange.current = cur;
+  }, [low, high]);
+
+  return (
+    <div className="calc">
+      <div className="calc-head">
+        <div>
+          <div className="calc-title">{t.calc.title}</div>
+          <div className="calc-sub">{t.calc.sub}</div>
+        </div>
+      </div>
+
+      <div className="field">
+        <label>
+          <span>{t.calc.length}</span>
+          <span className="hint">{t.calc.lengthHint}</span>
+        </label>
+        <div className="slider-row">
+          <input type="range" min="20" max="600" step="5" value={feet} onChange={e => setFeet(Number(e.target.value))} />
+          <div className="val">{feet} ft</div>
+        </div>
+      </div>
+
+      <div className="field">
+        <label>{t.calc.material}</label>
+        <div className="opts">
+          {t.calc.materials.map(m => (
+            <div key={m.id} className={`opt ${matId === m.id ? "on" : ""}`} onClick={() => setMatId(m.id)}>
+              <span className="n">{m.name}</span>
+              <span className="p">{m.note} · ${Math.round(tweaks.pricePerFoot * m.mult)}/ft</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="field">
+        <div className="addon-row" onClick={() => setGate(!gate)} style={{ cursor: "pointer" }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>{t.calc.gate}</div>
+            <div style={{ fontSize: 11, color: "#6b6f5e" }}>{t.calc.gateHint}</div>
+          </div>
+          <div className={`toggle ${gate ? "on" : ""}`} />
+        </div>
+      </div>
+
+      <div className="estimate">
+        <div className="label">{t.calc.estimate}</div>
+        <div className="num mono" ref={numRef}>
+          {fmt(low)} <span className="to">—</span> {fmt(high)}
+        </div>
+        <div className="breakdown">
+          <span><b>{t.calc.breakdown[0]}:</b> {fmt(Math.round(base))}</span>
+          {gate && <span><b>{t.calc.breakdown[1]}:</b> {fmt(gateCost)}</span>}
+          <span><b>{t.calc.breakdown[2]}:</b> ${Math.round(tweaks.pricePerFoot * mat.mult)}/ft</span>
+        </div>
+        <div className="cta-row">
+          <a href="#lead" className="btn">{t.calc.ctaLock} →</a>
+          <a href={`tel:${tweaks.phone.replace(/\D/g, "")}`} className="btn ghost">{t.calc.ctaCall}</a>
+        </div>
+      </div>
+
+      <div className="trust-strip">
+        <span className="stars">★★★★★</span>
+        <span>{t.calc.trust}</span>
+        <span style={{ marginLeft: "auto", fontSize: 11 }}>{t.calc.disclaimer}</span>
+      </div>
+    </div>
+  );
+}
+
+const VOICE_AI_CONFIG = {
+  locationId: "8IIJDyclaxysv6lPoKrD",
+  widgetId: "69e58d2806d5d5264d66eaab",
+  voiceAiConfigId: "69e585e6fc196d348a71bd8b",
+  apiEndpoint: "https://services.leadconnectorhq.com/chat-widget/public/start-voice-ai-call/",
+  livekitUrl: "wss://retell-ai-4ihahnq7.livekit.cloud",
+};
+
+function VoiceOrb({ t, lang }) {
+  const [state, setState] = useState("idle"); // 'idle' | 'connecting' | 'active' | 'disconnecting'
+  const [error, setError] = useState(null);
+  const orbRef = useRef(null);
+  const roomRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const analyserRafRef = useRef(null);
+
+  const uuid = () => "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === "x" ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+  const mongoId = () => {
+    const ts = Math.floor(Date.now() / 1000).toString(16).padStart(8, "0");
+    const rnd = Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    return ts + rnd;
+  };
+  const contactId = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let r = "";
+    for (let i = 0; i < 20; i++) r += chars.charAt(Math.floor(Math.random() * chars.length));
+    return r;
+  };
+
+  const attachAnalyser = (track) => {
+    try {
+      const rawTrack = track.mediaStreamTrack;
+      if (!rawTrack) return;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      const ctx = new AC();
+      audioCtxRef.current = ctx;
+      const stream = new MediaStream([rawTrack]);
+      const src = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.82;
+      src.connect(analyser);
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i];
+        const avg = Math.min(1, (sum / data.length) / 160);
+        if (orbRef.current) orbRef.current.style.setProperty("--audio-level", avg.toFixed(3));
+        analyserRafRef.current = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (e) {
+      console.warn("Audio analyser failed:", e);
+    }
+  };
+
+  const teardownAnalyser = () => {
+    if (analyserRafRef.current) cancelAnimationFrame(analyserRafRef.current);
+    analyserRafRef.current = null;
+    if (audioCtxRef.current) {
+      audioCtxRef.current.close().catch(() => {});
+      audioCtxRef.current = null;
+    }
+    if (orbRef.current) orbRef.current.style.setProperty("--audio-level", "0");
+  };
+
+  const endCall = async () => {
+    if (state === "idle" || state === "disconnecting") return;
+    setState("disconnecting");
+    teardownAnalyser();
+    try {
+      if (roomRef.current) {
+        await roomRef.current.disconnect();
+        roomRef.current = null;
+      }
+    } catch (e) {
+      console.warn("Disconnect error:", e);
+    }
+    document.querySelectorAll('[data-voiceai-audio="wefence-orb"]').forEach((el) => el.remove());
+    setState("idle");
+  };
+
+  const startCall = async () => {
+    if (!window.LivekitClient) {
+      setError(lang === "es" ? "Cargando SDK…" : "Loading SDK…");
+      setTimeout(() => setError(null), 2500);
+      return;
+    }
+    setState("connecting");
+    setError(null);
+
+    try {
+      const sessionId = uuid();
+      const payload = {
+        contactId: contactId(),
+        callId: mongoId(),
+        widgetId: VOICE_AI_CONFIG.widgetId,
+        locationId: VOICE_AI_CONFIG.locationId,
+        sessionId,
+        sessionFingerprint: uuid(),
+        eventData: {
+          source: "direct",
+          referrer: document.referrer || "",
+          keyword: "",
+          adSource: "",
+          url_params: {},
+          page: { url: window.location.href, title: document.title },
+          timestamp: Date.now(),
+          campaign: "",
+          contactSessionIds: { ids: [sessionId] },
+          type: "page-visit",
+          pageVisitType: "text-widget",
+          domain: window.location.hostname,
+          version: "v3",
+          parentId: "",
+          parentName: "",
+          fingerprint: null,
+          documentURL: window.location.href,
+        },
+      };
+
+      const resp = await fetch(VOICE_AI_CONFIG.apiEndpoint + VOICE_AI_CONFIG.voiceAiConfigId, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "*/*" },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) throw new Error("API " + resp.status);
+      const data = await resp.json();
+
+      const room = new window.LivekitClient.Room({
+        adaptiveStream: true,
+        dynacast: true,
+        audioCaptureDefaults: {
+          autoGainControl: true,
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
+      roomRef.current = room;
+
+      room.on(window.LivekitClient.RoomEvent.TrackSubscribed, (track) => {
+        if (track.kind === window.LivekitClient.Track.Kind.Audio) {
+          const el = track.attach();
+          el.setAttribute("data-voiceai-audio", "wefence-orb");
+          document.body.appendChild(el);
+          attachAnalyser(track);
+        }
+      });
+
+      room.on(window.LivekitClient.RoomEvent.Disconnected, () => {
+        if (roomRef.current) endCall();
+      });
+
+      await room.connect(VOICE_AI_CONFIG.livekitUrl, data.accessToken);
+      await room.localParticipant.setMicrophoneEnabled(true);
+      setState("active");
+    } catch (e) {
+      console.error("Start call error:", e);
+      setError((lang === "es" ? "Error: " : "Error: ") + (e.message || "connection"));
+      setState("idle");
+      setTimeout(() => setError(null), 4000);
+    }
+  };
+
+  useEffect(() => {
+    const onUnload = () => { if (roomRef.current) roomRef.current.disconnect(); };
+    window.addEventListener("beforeunload", onUnload);
+    return () => {
+      window.removeEventListener("beforeunload", onUnload);
+      if (roomRef.current) roomRef.current.disconnect();
+      teardownAnalyser();
+    };
+  }, []);
+
+  const onClick = () => {
+    if (state === "idle") startCall();
+    else if (state === "active") endCall();
+  };
+
+  const statusLabel =
+    state === "connecting" ? (lang === "es" ? "Conectando…" : "Connecting…") :
+    state === "active"     ? (lang === "es" ? "En llamada · toca para colgar" : "Live · tap to end") :
+    state === "disconnecting" ? (lang === "es" ? "Colgando…" : "Disconnecting…") :
+    t.orb.sub;
+
+  const btnTitle = state === "active"
+    ? (lang === "es" ? "Colgar" : "End call")
+    : t.orb.title;
+
+  return (
+    <div className="orb-wrap" data-state={state} title={btnTitle}>
+      <div className="orb-label">
+        <span className="k">AI Voice Agent</span>
+        <strong style={{ color: "#fff" }}>{t.orb.title}</strong>
+        <div className="status-row" style={{ color: "#cfc8b4" }}>
+          <span className="status-dot" />
+          <span>{statusLabel}</span>
+        </div>
+        {error && <div className="orb-err">{error}</div>}
+      </div>
+      <button
+        className="orb"
+        ref={orbRef}
+        aria-label={btnTitle}
+        onClick={onClick}
+        disabled={state === "connecting" || state === "disconnecting"}
+      >
+        <span className="ring-3" />
+        <span className="wave" />
+        <span className="core" />
+        <span className="mic">
+          {state === "active" ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" fill="currentColor" stroke="none"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          )}
+        </span>
+        <span className="spinner" />
+      </button>
+    </div>
+  );
+}
+
+function App() {
+  const [tweaks] = useState(window.__TWEAKS__);
+  const [lang, setLang] = useState(tweaks.defaultLanguage || "en");
+  const [sent, setSent] = useState(false);
+  const t = T[lang];
+
+  // Scroll reveal via IntersectionObserver
+  useEffect(() => {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("in");
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+
+    const nodes = document.querySelectorAll(".reveal, .reveal-x, .reveal-scale, .reveal-blur");
+    nodes.forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, [lang]);
+
+  // Nav scroll-shrink
+  useEffect(() => {
+    const nav = document.querySelector(".nav");
+    if (!nav) return;
+    const onScroll = () => {
+      if (window.scrollY > 20) nav.classList.add("scrolled");
+      else nav.classList.remove("scrolled");
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Hero mouse-follow spotlight
+  useEffect(() => {
+    const hero = document.querySelector(".hero");
+    if (!hero) return;
+    let raf;
+    const onMove = (e) => {
+      const r = hero.getBoundingClientRect();
+      const mx = ((e.clientX - r.left) / r.width) * 100;
+      const my = ((e.clientY - r.top) / r.height) * 100;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        hero.style.setProperty("--mx", mx + "%");
+        hero.style.setProperty("--my", my + "%");
+      });
+    };
+    hero.addEventListener("mousemove", onMove);
+    return () => { hero.removeEventListener("mousemove", onMove); cancelAnimationFrame(raf); };
+  }, []);
+
+  // 3D tilt on service + review cards
+  useEffect(() => {
+    if (window.matchMedia("(hover: none)").matches) return;
+    const cards = document.querySelectorAll(".svc, .review");
+    const intensity = 5;
+    const attach = (el) => {
+      let raf;
+      const onMove = (e) => {
+        const r = el.getBoundingClientRect();
+        const px = ((e.clientX - r.left) / r.width) * 2 - 1;
+        const py = ((e.clientY - r.top) / r.height) * 2 - 1;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          el.style.transform = `perspective(1000px) rotateY(${px * intensity}deg) rotateX(${-py * intensity}deg) translateY(-4px)`;
+        });
+      };
+      const onLeave = () => {
+        cancelAnimationFrame(raf);
+        el.style.transform = "";
+      };
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+      return () => {
+        el.removeEventListener("mousemove", onMove);
+        el.removeEventListener("mouseleave", onLeave);
+        cancelAnimationFrame(raf);
+      };
+    };
+    const cleanups = Array.from(cards).map(attach);
+    return () => cleanups.forEach(c => c());
+  }, [lang]);
+
+  // Magnetic big buttons
+  useEffect(() => {
+    if (window.matchMedia("(hover: none)").matches) return;
+    const btns = document.querySelectorAll(".btn.big");
+    const attach = (el) => {
+      let raf;
+      const onMove = (e) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = (e.clientX - cx) * 0.2;
+        const dy = (e.clientY - cy) * 0.3;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          el.style.transform = `translate(${dx}px, ${dy}px)`;
+        });
+      };
+      const onLeave = () => {
+        cancelAnimationFrame(raf);
+        el.style.transform = "";
+      };
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+      return () => {
+        el.removeEventListener("mousemove", onMove);
+        el.removeEventListener("mouseleave", onLeave);
+        cancelAnimationFrame(raf);
+      };
+    };
+    const cleanups = Array.from(btns).map(attach);
+    return () => cleanups.forEach(c => c());
+  }, [lang]);
+
+  return (
+    <>
+      <ScrollProgress />
+      {/* NAV */}
+      <div className="nav">
+        <div className="container nav-inner">
+          <div className="logo">
+            <div className="logo-mark">W</div>
+            <span>WeFence</span>
+          </div>
+          <div className="nav-cta">
+            <div className="lang-pill">
+              <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>EN</button>
+              <button className={lang === "es" ? "active" : ""} onClick={() => setLang("es")}>ES</button>
+            </div>
+            <a href="#lead" className="btn">{t.nav.quote}</a>
+          </div>
+        </div>
+      </div>
+
+      {/* HERO + CALCULATOR */}
+      <header className="hero">
+        <div className="spotlight" />
+        <div className="container hero-grid">
+          <div>
+            <span className="eyebrow reveal"><span className="dot" />{t.hero.eyebrow}</span>
+            <h1 className="display reveal d1">
+              {t.hero.title[0]}<em>{t.hero.title[1]}</em>{t.hero.title[2]}
+            </h1>
+            <p className="lead reveal d2">{t.hero.lead}</p>
+            <div className="hero-actions reveal d3">
+              <a href="#estimator" className="btn amber big">{t.hero.ctaPrimary} →</a>
+              <a href="#work" className="btn ghost big">{t.hero.ctaSecondary}</a>
+            </div>
+            <div className="hero-meta reveal d4">
+              {t.hero.meta.map((m, i) => (
+                <div key={`${lang}-${i}`}>
+                  <span className="k serif"><CountUp value={m.k} /></span>
+                  <span>{m.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div id="estimator" className="reveal-scale d2">
+            <Calculator t={t} tweaks={tweaks} />
+          </div>
+        </div>
+      </header>
+
+      {/* SERVICES */}
+      <section id="services">
+        <div className="container">
+          <div className="section-head reveal">
+            <div>
+              <div className="label">{t.services.label}</div>
+              <h2>{t.services.title[0]}<em>{t.services.title[1]}</em>{t.services.title[2]}</h2>
+            </div>
+            <p className="desc">{t.services.desc}</p>
+          </div>
+          <div className="svc-grid">
+            {t.services.items.map((s, i) => (
+              <div key={i} className={`svc reveal d${i+1}`}>
+                <div className="img">
+                  <Placeholder
+                    variant={["vinyl","wood","aluminum","chain"][i]}
+                    label={s.name}
+                    src={SERVICE_IMAGES[i]}
+                    alt={s.name}
+                  />
+                  <span className="tag">{s.tag}</span>
+                </div>
+                <div className="body">
+                  <h3>{s.name}</h3>
+                  <p>{s.p}</p>
+                  <div className="price">{s.price}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* GALLERY */}
+      <section id="work" style={{ paddingTop: 0 }}>
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <div className="label">{t.gallery.label}</div>
+              <h2>{t.gallery.title[0]}<em>{t.gallery.title[1]}</em>{t.gallery.title[2]}</h2>
+            </div>
+            <p className="desc">{t.gallery.desc}</p>
+          </div>
+          <div className="gallery">
+            <div className="g reveal"><Placeholder variant="vinyl" label="Hero install photo" src={GALLERY_IMAGES[0]} alt={t.gallery.caps[0]} /><span className="cap">{t.gallery.caps[0]}</span></div>
+            <div className="g reveal d1"><Placeholder variant="aluminum" label="Aluminum pool fence" src={GALLERY_IMAGES[1]} alt={t.gallery.caps[1]} /><span className="cap">{t.gallery.caps[1]}</span></div>
+            <div className="g reveal d2"><Placeholder variant="wood" label="Wood privacy" src={GALLERY_IMAGES[2]} alt={t.gallery.caps[2]} /><span className="cap">{t.gallery.caps[2]}</span></div>
+            <div className="g reveal d3"><Placeholder variant="chain" label="Chain-link" src={GALLERY_IMAGES[3]} alt={t.gallery.caps[3]} /><span className="cap">{t.gallery.caps[3]}</span></div>
+            <div className="g reveal d4"><Placeholder variant="vinyl" label="White vinyl farm" src={GALLERY_IMAGES[4]} alt={t.gallery.caps[4]} /><span className="cap">{t.gallery.caps[4]}</span></div>
+          </div>
+        </div>
+      </section>
+
+      {/* PROCESS */}
+      <section className="process" id="process">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <div className="label">{t.process.label}</div>
+              <h2>{t.process.title[0]}<em>{t.process.title[1]}</em>{t.process.title[2]}</h2>
+            </div>
+            <p className="desc">{t.process.desc}</p>
+          </div>
+          <div className="steps">
+            {t.process.steps.map((s, i) => (
+              <div key={i} className={`step reveal d${i+1}`}>
+                <div className="n">{s.n}</div>
+                <h4>{s.h}</h4>
+                <p>{s.p}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* REVIEWS */}
+      <section id="reviews">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <div className="label">{t.reviews.label}</div>
+              <h2>{t.reviews.title[0]}<em>{t.reviews.title[1]}</em>{t.reviews.title[2]}</h2>
+            </div>
+            <p className="desc">{t.reviews.desc}</p>
+          </div>
+          <div className="reviews">
+            {t.reviews.items.map((r, i) => (
+              <div key={i} className={`review reveal d${i+1}`}>
+                <div className="stars">{"★".repeat(r.stars)}</div>
+                <blockquote>"{r.q}"</blockquote>
+                <div className="who">
+                  <div className="av">{r.av}</div>
+                  <div>
+                    <div style={{ color: "var(--ink)", fontWeight: 500 }}>{r.name}</div>
+                    <div>{r.loc}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICE AREA */}
+      <section id="area" style={{ paddingTop: 0 }}>
+        <div className="container area">
+          <div className="reveal-x">
+            <div className="label" style={{ fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6b6f5e", marginBottom: 8 }}>{t.area.label}</div>
+            <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "clamp(40px, 5vw, 56px)", margin: 0, fontWeight: 400, lineHeight: 1.02 }}>
+              {t.area.title[0]}<em style={{ fontStyle: "italic", color: "var(--moss)" }}>{t.area.title[1]}</em>{t.area.title[2]}
+            </h2>
+            <p style={{ color: "#4a4f41", maxWidth: 440, marginTop: 16 }}>{t.area.desc}</p>
+            <div className="cities">
+              {t.area.cities.map(c => <span key={c} className="chip">{c}</span>)}
+            </div>
+          </div>
+          <div className="map-card reveal-scale d1">
+            <svg viewBox="0 0 400 300" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: "absolute", inset: 0 }}>
+              <defs>
+                <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+                  <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(18,22,15,0.08)" strokeWidth="1"/>
+                </pattern>
+              </defs>
+              <rect width="400" height="300" fill="url(#grid)" />
+              <path d="M60 80 L180 60 L290 70 L340 120 L350 200 L280 240 L180 250 L80 220 L50 150 Z"
+                    fill="rgba(74,107,58,0.15)" stroke="var(--forest)" strokeWidth="1.5" strokeDasharray="4 3"/>
+              <circle cx="190" cy="150" r="8" fill="var(--amber)" />
+              <circle cx="190" cy="150" r="18" fill="none" stroke="var(--amber)" strokeWidth="1" opacity="0.5">
+                <animate attributeName="r" from="8" to="28" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" from="0.6" to="0" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <text x="202" y="144" fontFamily="Instrument Serif, serif" fontSize="20" fill="var(--ink)">Ocala</text>
+              <circle cx="220" cy="195" r="4" fill="var(--forest)" />
+              <text x="228" y="200" fontFamily="Geist Mono, monospace" fontSize="10" fill="#4a4f41">Belleview</text>
+              <circle cx="260" cy="215" r="4" fill="var(--forest)" />
+              <text x="268" y="220" fontFamily="Geist Mono, monospace" fontSize="10" fill="#4a4f41">Summerfield</text>
+              <circle cx="110" cy="170" r="4" fill="var(--forest)" />
+              <text x="50" y="165" fontFamily="Geist Mono, monospace" fontSize="10" fill="#4a4f41">Dunnellon</text>
+              <circle cx="240" cy="130" r="4" fill="var(--forest)" />
+              <text x="248" y="134" fontFamily="Geist Mono, monospace" fontSize="10" fill="#4a4f41">Silver Springs</text>
+            </svg>
+            <div style={{ position: "absolute", bottom: 14, left: 14, fontFamily: "'Geist Mono', monospace", fontSize: 10, color: "#6b6f5e", letterSpacing: "0.1em" }}>
+              MARION COUNTY · FL · 40MI RADIUS
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* LEAD CTA */}
+      <section id="lead" style={{ paddingTop: 0 }}>
+        <div className="container">
+          <div className="leadcta reveal-scale">
+            <div style={{ position: "relative" }}>
+              <h3>{t.leadcta.title[0]}<em style={{ fontStyle: "italic" }}>{t.leadcta.title[1]}</em>{t.leadcta.title[2]}</h3>
+              <p style={{ marginTop: 16, fontSize: 16, lineHeight: 1.55 }}>{t.leadcta.desc}</p>
+              <div style={{ display: "flex", gap: 20, marginTop: 28, flexWrap: "wrap", fontSize: 13, color: "#cfc8b4" }}>
+                <div>
+                  <div style={{ color: "#b3ad99", textTransform: "uppercase", letterSpacing: "0.12em", fontSize: 11, marginBottom: 4 }}>Call</div>
+                  <a href={`tel:${tweaks.phone}`} style={{ color: "var(--cream)", textDecoration: "none", fontFamily: "'Instrument Serif', serif", fontSize: 24 }}>{tweaks.phone}</a>
+                </div>
+                <div>
+                  <div style={{ color: "#b3ad99", textTransform: "uppercase", letterSpacing: "0.12em", fontSize: 11, marginBottom: 4 }}>Email</div>
+                  <a href={`mailto:${tweaks.email}`} style={{ color: "var(--cream)", textDecoration: "none", fontFamily: "'Instrument Serif', serif", fontSize: 24 }}>{tweaks.email}</a>
+                </div>
+              </div>
+            </div>
+            <form className="lead-form" onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
+              {sent ? (
+                <div style={{ padding: 24, textAlign: "center" }}>
+                  <div style={{ fontSize: 48, color: "var(--amber-soft)" }}>✓</div>
+                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: 26, marginTop: 8 }}>{t.leadcta.form.ok}</div>
+                </div>
+              ) : (
+                <>
+                  <div className="field">
+                    <label>{t.leadcta.form.name}</label>
+                    <input type="text" required placeholder="Juan García" />
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    <div className="field">
+                      <label>{t.leadcta.form.phone}</label>
+                      <input type="tel" required placeholder="(352) 555-0199" />
+                    </div>
+                    <div className="field">
+                      <label>{t.leadcta.form.email}</label>
+                      <input type="email" placeholder="you@email.com" />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label>{t.leadcta.form.about}</label>
+                    <input type="text" placeholder="150ft of vinyl privacy + 1 gate" />
+                  </div>
+                  <button type="submit" className="btn">{t.leadcta.form.send} →</button>
+                </>
+              )}
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" style={{ paddingTop: 0 }}>
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <div className="label">{t.faq.label}</div>
+              <h2>{t.faq.title[0]}<em>{t.faq.title[1]}</em>{t.faq.title[2]}</h2>
+            </div>
+          </div>
+          <div className="faq">
+            {t.faq.items.map((f, i) => (
+              <details key={i} open={i === 0}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer>
+        <div className="container">
+          <div className="foot-top">
+            <div>
+              <div className="logo" style={{ color: "var(--cream)" }}>
+                <div className="logo-mark" style={{ background: "var(--cream)", color: "var(--forest-deep)" }}>W</div>
+                <span>WeFence</span>
+              </div>
+              <p style={{ color: "#cfc8b4", fontSize: 14, lineHeight: 1.6, maxWidth: 320, marginTop: 12 }}>
+                Family-owned fence installation serving Ocala, Marion County, and Central Florida since 2014. Licensed · Bonded · Insured.
+              </p>
+            </div>
+            <div>
+              <h5>Services</h5>
+              <ul>
+                <li><a href="#services">Vinyl</a></li>
+                <li><a href="#services">Wood</a></li>
+                <li><a href="#services">Aluminum</a></li>
+                <li><a href="#services">Chain-Link</a></li>
+              </ul>
+            </div>
+            <div>
+              <h5>Company</h5>
+              <ul>
+                <li><a href="#process">Our process</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#area">Service area</a></li>
+                <li><a href="#faq">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h5>Contact</h5>
+              <ul>
+                <li><a href={`tel:${tweaks.phone}`}>{tweaks.phone}</a></li>
+                <li><a href={`mailto:${tweaks.email}`}>{tweaks.email}</a></li>
+                <li><a>Ocala, FL 34470</a></li>
+                <li><a>Mon–Sat · 7am – 7pm</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="foot-bottom">
+            <span>© 2026 We Fence LLC · FL License #CBC-0000000</span>
+            <span className="mono">est. 2014 · Ocala, FL</span>
+          </div>
+        </div>
+      </footer>
+
+      <VoiceOrb t={t} lang={lang} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+</script>
+</body>
+</html>
