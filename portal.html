@@ -12,6 +12,8 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js" crossorigin="anonymous"></script>
 <style>
   :root {
     --ink: #12160F;
@@ -42,7 +44,7 @@
   .mono { font-family: 'Geist Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
   a { color: inherit; }
   button { font-family: inherit; cursor: pointer; }
-  .container { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+  .container { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
 
   /* HEADER */
   .nav {
@@ -136,126 +138,203 @@
     font-family: 'Geist Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase;
   }
 
-  /* DASHBOARD */
-  .panel {
-    padding: 36px 0;
-  }
+  /* PANEL */
+  .panel { padding: 36px 0; }
   .panel-head {
     display: flex; align-items: end; justify-content: space-between;
     gap: 24px; flex-wrap: wrap; margin-bottom: 24px;
   }
   .panel-head .label {
-    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6b6f5e; margin-bottom: 4px;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6b6f5e; margin-bottom: 6px;
   }
   .panel-head h2 {
-    font-family: 'Instrument Serif', serif; font-size: clamp(36px, 4vw, 52px);
+    font-family: 'Instrument Serif', serif; font-size: clamp(34px, 4vw, 48px);
     line-height: 1.02; letter-spacing: -0.01em; margin: 0; font-weight: 400;
+    display: flex; align-items: center; gap: 12px;
   }
-  .panel-head h2 em { font-style: italic; color: var(--moss); }
-  .stats {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-    margin-bottom: 28px;
+  .panel-head h2 em { font-style: italic; color: var(--amber); }
+  .count-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 26px; min-width: 26px; padding: 0 9px;
+    border-radius: 999px; background: rgba(217,154,43,0.14);
+    border: 1px solid rgba(217,154,43,0.4);
+    color: #8c5a13; font-size: 12px; font-weight: 600;
+    font-family: 'Geist Mono', monospace;
   }
-  .stat-card {
-    background: #fff; border: 1px solid var(--line); border-radius: 16px;
-    padding: 18px 20px;
-    transition: transform .2s ease, box-shadow .2s ease;
-  }
-  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -18px rgba(0,0,0,0.18); }
-  .stat-card .k {
-    font-family: 'Instrument Serif', serif; font-size: 38px; line-height: 1;
-    letter-spacing: -0.02em; display: block;
-  }
-  .stat-card .l {
-    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: #6b6f5e; margin-top: 6px;
-  }
-  .stat-card.accent .k { color: var(--amber); }
+  .panel-head .sub { color: #6b6f5e; font-size: 14px; margin-top: 6px; }
 
-  .toolbar {
-    display: flex; gap: 8px; flex-wrap: wrap;
-    margin-bottom: 16px;
+  /* ACTION BAR (when something selected) */
+  .action-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(90deg, rgba(217,154,43,0.16), rgba(232,178,74,0.08));
+    border: 1px solid rgba(217,154,43,0.4); border-radius: 14px;
+    padding: 11px 18px; margin-bottom: 12px;
+    box-shadow: 0 6px 18px -10px rgba(217,154,43,0.4);
+    animation: slideDown .25s cubic-bezier(.22,1,.36,1);
   }
-  .filter-pill {
-    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line);
-    background: #fff; color: #4a4f41;
-    font-size: 12px; font-family: 'Geist Mono', monospace;
-    letter-spacing: 0.08em; text-transform: uppercase;
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .action-bar .info {
+    display: flex; align-items: center; gap: 9px;
+    color: #8c5a13; font-size: 13px; font-weight: 600;
+  }
+  .action-bar .info .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--amber);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+  }
+  .btn-download {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 10px;
+    background: var(--ink); color: var(--cream); border: 0;
+    font-size: 13px; font-weight: 600;
     transition: all .15s ease;
   }
-  .filter-pill:hover { border-color: var(--ink); }
-  .filter-pill.on { background: var(--ink); color: var(--cream); border-color: var(--ink); }
-  .toolbar .spacer { flex: 1; }
-  .toolbar .meta { font-size: 11px; color: #8a8e7c; align-self: center; font-family: 'Geist Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
+  .btn-download:hover { background: var(--forest-deep); transform: translateY(-1px); }
+  .btn-download:active { transform: translateY(0); }
 
-  /* LEADS */
-  .leads {
+  /* TABLE */
+  .table-wrap {
     background: #fff; border: 1px solid var(--line); border-radius: 18px;
-    overflow: hidden;
+    overflow: hidden; box-shadow: 0 1px 8px rgba(0,0,0,0.04);
   }
-  .leads-head {
-    display: grid;
-    grid-template-columns: 110px 1.2fr 1fr 0.9fr 1fr 130px;
-    gap: 14px; padding: 14px 22px;
-    background: var(--cream); border-bottom: 1px solid var(--line);
+  table.leads { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.leads thead tr { background: var(--cream); border-bottom: 1px solid var(--line); }
+  table.leads th {
+    text-align: left; padding: 13px 18px;
     font-family: 'Geist Mono', monospace; font-size: 10px;
     letter-spacing: 0.14em; text-transform: uppercase; color: #6b6f5e;
+    font-weight: 600;
   }
-  .lead-row {
-    display: grid;
-    grid-template-columns: 110px 1.2fr 1fr 0.9fr 1fr 130px;
-    gap: 14px; padding: 18px 22px;
-    border-bottom: 1px solid var(--line-soft);
-    align-items: center; font-size: 14px;
-    transition: background .15s ease;
+  table.leads th.checkbox-col { width: 44px; padding: 13px 0 13px 18px; }
+  table.leads td { padding: 16px 18px; vertical-align: top; border-top: 1px solid var(--line-soft); }
+  table.leads tbody tr { transition: background .15s ease; }
+  table.leads tbody tr:hover { background: var(--paper); }
+  table.leads tbody tr.selected { background: rgba(217,154,43,0.05); }
+  table.leads tbody tr:first-child td { border-top: 0; }
+
+  .checkbox {
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 1.5px solid rgba(18,22,15,0.25); cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background: #fff;
+    display: grid; place-items: center;
+    transition: all .15s ease;
   }
-  .lead-row:last-child { border-bottom: 0; }
-  .lead-row:hover { background: var(--paper); }
-  .lead-row .when { font-family: 'Geist Mono', monospace; font-size: 12px; color: #6b6f5e; }
-  .lead-row .name {
-    font-family: 'Instrument Serif', serif; font-size: 20px; line-height: 1.1; letter-spacing: -0.01em;
+  .checkbox:hover { border-color: var(--forest); }
+  .checkbox:checked {
+    background: var(--forest); border-color: var(--forest);
   }
-  .lead-row .name .lang {
+  .checkbox:checked::after {
+    content: ""; width: 9px; height: 5px;
+    border-left: 2px solid var(--cream); border-bottom: 2px solid var(--cream);
+    transform: rotate(-45deg) translate(0, -1px);
+  }
+  .checkbox:indeterminate {
+    background: var(--forest); border-color: var(--forest);
+  }
+  .checkbox:indeterminate::after {
+    content: ""; width: 8px; height: 2px; background: var(--cream); border-radius: 1px;
+  }
+
+  /* CONTACT cell */
+  .c-date { font-family: 'Geist Mono', monospace; font-size: 10.5px; color: #8a8e7c; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+  .c-name {
+    font-family: 'Instrument Serif', serif; font-size: 22px;
+    line-height: 1.1; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .c-name .badge-lang {
+    display: inline-block; vertical-align: middle; margin-left: 6px;
     font-family: 'Geist Mono', monospace; font-size: 9px;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: #8a8e7c; padding: 2px 6px;
-    border: 1px solid var(--line); border-radius: 999px; margin-left: 8px;
-    display: inline-block; vertical-align: middle;
+    letter-spacing: 0.14em; text-transform: uppercase; color: #8a8e7c;
+    padding: 2px 6px; border: 1px solid var(--line); border-radius: 999px;
   }
-  .lead-row .contact { font-size: 13px; line-height: 1.5; }
-  .lead-row .contact a { color: var(--forest); text-decoration: none; }
-  .lead-row .contact a:hover { color: var(--ink); text-decoration: underline; }
-  .lead-row .what { font-size: 13px; color: #4a4f41; line-height: 1.4; }
-  .lead-row .what .badge {
-    display: inline-block; font-family: 'Geist Mono', monospace; font-size: 10px;
-    letter-spacing: 0.08em; text-transform: uppercase; color: var(--forest);
-    background: var(--cream-2); padding: 2px 7px; border-radius: 999px;
-    margin-right: 6px; margin-bottom: 4px;
-  }
-  .lead-row .est {
-    font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--ink);
-  }
-  .lead-row .est .range { display: block; }
-  .lead-row .est .ftrate { font-size: 10px; color: #8a8e7c; margin-top: 2px; }
+  .c-contact { margin-top: 6px; font-size: 13px; color: var(--forest); display: flex; flex-direction: column; gap: 2px; }
+  .c-contact a { text-decoration: none; transition: color .15s ease; }
+  .c-contact a:hover { color: var(--ink); text-decoration: underline; }
+  .c-contact .em { color: #6b6f5e; font-size: 12px; }
 
-  .status-select {
-    padding: 6px 10px; border-radius: 999px;
+  /* AI Call Summary cell */
+  .summary-card {
+    background: var(--paper);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: all .15s ease;
+  }
+  .summary-card:hover {
+    background: #fff;
+    border-color: var(--line);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .summary-card .head {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Geist Mono', monospace; font-size: 9px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--moss);
+    margin-bottom: 8px;
+  }
+  .summary-card .head .live-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--moss);
+    box-shadow: 0 0 6px var(--moss);
+  }
+  .summary-card .text { font-size: 13.5px; color: #2a2f24; line-height: 1.55; white-space: pre-wrap; }
+  .summary-card .toggle {
+    margin-top: 6px;
+    display: inline-flex; align-items: center; gap: 4px;
+    background: transparent; border: 0; padding: 0;
+    color: var(--amber); font-size: 12px; font-weight: 600;
+    cursor: pointer;
+  }
+  .summary-card .toggle:hover { color: #8c5a13; }
+  .summary-card .meta {
+    margin-top: 8px; font-family: 'Geist Mono', monospace; font-size: 10px; color: #8a8e7c;
+    letter-spacing: 0.06em;
+  }
+  .no-call {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: #b3b6a8; font-size: 12px;
+  }
+  .no-call .dot { width: 6px; height: 6px; border-radius: 50%; background: #d6d3c5; }
+
+  /* PAGINATION */
+  .pager {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 4px; margin-top: 12px; flex-wrap: wrap; gap: 12px;
+  }
+  .pager .left, .pager .right { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #6b6f5e; font-family: 'Geist Mono', monospace; letter-spacing: 0.06em; }
+  .page-size {
+    display: flex; gap: 4px; padding: 3px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 999px;
+  }
+  .page-size button {
+    border: 0; background: transparent; padding: 4px 10px;
+    border-radius: 999px; font: inherit; font-size: 11px; color: #6b6f5e;
+    cursor: pointer; transition: all .15s ease;
+    font-family: 'Geist Mono', monospace; letter-spacing: 0.06em;
+  }
+  .page-size button:hover { color: var(--ink); }
+  .page-size button.on { background: var(--ink); color: var(--cream); }
+
+  .page-nav { display: flex; align-items: center; gap: 4px; }
+  .page-nav button {
+    width: 28px; height: 28px; border-radius: 8px;
     border: 1px solid var(--line); background: #fff;
-    font: inherit; font-size: 11px; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--ink);
-    cursor: pointer; outline: none; appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3e%3cpath d='M1 1l4 4 4-4' stroke='%236b6f5e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
-    background-repeat: no-repeat; background-position: right 10px center;
-    padding-right: 26px;
+    display: grid; place-items: center;
+    color: #6b6f5e; cursor: pointer; transition: all .15s ease;
   }
-  .status-new { background-color: rgba(217,154,43,0.12); color: #8c5a13; border-color: rgba(217,154,43,0.4); }
-  .status-contacted { background-color: rgba(74,107,58,0.12); color: var(--forest); border-color: rgba(74,107,58,0.4); }
-  .status-scheduled { background-color: rgba(40,80,180,0.1); color: #1f4488; border-color: rgba(40,80,180,0.35); }
-  .status-won { background-color: rgba(40,140,60,0.14); color: #1f6638; border-color: rgba(40,140,60,0.35); }
-  .status-lost { background-color: rgba(120,120,120,0.12); color: #555; border-color: rgba(120,120,120,0.3); }
+  .page-nav button:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
+  .page-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .page-nav .info { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--ink); padding: 0 8px; }
 
+  /* EMPTY */
   .empty {
     padding: 80px 24px; text-align: center;
+    background: #fff; border: 1px solid var(--line); border-radius: 18px;
   }
   .empty .ico {
     width: 64px; height: 64px; border-radius: 50%;
@@ -266,43 +345,35 @@
     font-family: 'Instrument Serif', serif; font-size: 28px; margin: 0 0 6px;
     letter-spacing: -0.01em; font-weight: 400;
   }
-  .empty p { color: #6b6f5e; font-size: 14px; margin: 0; max-width: 360px; margin: 0 auto; line-height: 1.55; }
+  .empty p { color: #6b6f5e; font-size: 14px; margin: 0 auto; max-width: 360px; line-height: 1.55; }
 
-  .loading {
-    padding: 80px 24px; text-align: center; color: #6b6f5e;
-    font-family: 'Geist Mono', monospace; font-size: 12px;
-    letter-spacing: 0.14em; text-transform: uppercase;
+  /* LOADING */
+  .skeleton {
+    height: 96px; background: var(--paper);
+    border-radius: 14px; margin-bottom: 10px;
+    animation: shimmer 1.4s ease-in-out infinite;
   }
-  .loading::after {
-    content: ''; display: inline-block; width: 6px; animation: dots 1.4s steps(4, end) infinite;
-  }
-  @keyframes dots {
-    0%, 100% { content: ''; }
-    25% { content: '.'; }
-    50% { content: '..'; }
-    75% { content: '...'; }
+  @keyframes shimmer {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.6; }
   }
 
   /* RESPONSIVE */
-  @media (max-width: 960px) {
-    .container { padding: 0 18px; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .leads-head { display: none; }
-    .lead-row {
-      grid-template-columns: 1fr;
-      gap: 8px;
-      padding: 18px 18px;
-    }
-    .lead-row > div { display: block; }
-    .lead-row .name { font-size: 22px; }
-    .lead-row .est { padding-top: 4px; border-top: 1px solid var(--line-soft); }
+  @media (max-width: 880px) {
+    .container { padding: 0 16px; }
+    table.leads thead { display: none; }
+    table.leads, table.leads tbody, table.leads tr, table.leads td { display: block; }
+    table.leads tr { border-bottom: 1px solid var(--line-soft); padding: 8px 4px; }
+    table.leads td { border-top: 0; padding: 8px 14px; }
+    table.leads td.checkbox-cell { padding-bottom: 0; }
+    .nav-meta .greeting { display: none; }
+    .panel-head h2 { font-size: 28px; }
+    .pager { justify-content: center; }
   }
   @media (max-width: 560px) {
-    .panel-head h2 { font-size: 30px; }
-    .stat-card .k { font-size: 30px; }
     .login-card { padding: 28px 22px; }
     .login-card h1 { font-size: 30px; }
-    .nav-meta .greeting { display: none; }
+    .c-name { font-size: 20px; }
   }
 </style>
 </head>
@@ -317,7 +388,7 @@
 </script>
 
 <script type="text/babel" data-presets="env,react">
-const { useState, useEffect, useMemo, useCallback } = React;
+const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
 const supabase = window.supabase.createClient(
   window.__SUPABASE__.url,
@@ -325,34 +396,126 @@ const supabase = window.supabase.createClient(
   { auth: { persistSession: true, autoRefreshToken: true } }
 );
 
-const STATUS_OPTIONS = [
-  { id: "new",       label: "New" },
-  { id: "contacted", label: "Contacted" },
-  { id: "scheduled", label: "Scheduled" },
-  { id: "won",       label: "Won" },
-  { id: "lost",      label: "Lost" },
-];
-
-const MATERIAL_LABELS = {
-  vinyl: "Vinyl",
-  wood: "Wood",
-  aluminum: "Aluminum",
-  chain: "Chain-link",
-};
+const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
 function fmtDate(iso) {
-  const d = new Date(iso);
-  const now = new Date();
-  const diffMin = Math.floor((now - d) / 60000);
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return diffMin + "m ago";
-  const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return diffH + "h ago";
-  const diffD = Math.floor(diffH / 24);
-  if (diffD < 7) return diffD + "d ago";
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
-const fmt$ = n => "$" + Number(n || 0).toLocaleString();
+function fmtDateLong(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+// Build the call-summary text shown in the table cell + PDF
+function summaryText(l) {
+  if (l.call_summary && l.call_summary.trim()) return l.call_summary.trim();
+  if (l.call_transcript && l.call_transcript.trim()) return l.call_transcript.trim();
+  // Fall back to form intent if present
+  const bits = [];
+  if (l.about) bits.push(l.about);
+  if (l.feet) bits.push(l.feet + " ft");
+  if (l.material) bits.push(l.material);
+  if (l.has_gate) bits.push("+ gate");
+  if (l.estimate_low && l.estimate_high) bits.push("estimate $" + l.estimate_low.toLocaleString() + " – $" + l.estimate_high.toLocaleString());
+  return bits.length ? bits.join(" · ") : null;
+}
+
+function CallSummaryCell({ lead }) {
+  const [expanded, setExpanded] = useState(false);
+  const text = summaryText(lead);
+  const hasCall = !!(lead.call_summary || lead.call_transcript);
+
+  if (!text) {
+    return (
+      <span className="no-call">
+        <span className="dot" />
+        No call yet
+      </span>
+    );
+  }
+
+  const isLong = text.length > 180;
+  const preview = isLong && !expanded ? text.slice(0, 180).trimEnd() + "…" : text;
+
+  return (
+    <div className="summary-card">
+      {hasCall && (
+        <div className="head">
+          <span className="live-dot" />
+          <span>AI Call Summary</span>
+        </div>
+      )}
+      <div className="text">{preview}</div>
+      {isLong && (
+        <button className="toggle" onClick={() => setExpanded(!expanded)}>
+          {expanded ? "Show less ↑" : "Read more ↓"}
+        </button>
+      )}
+      {hasCall && lead.call_at && (
+        <div className="meta">{fmtDate(lead.call_at)}</div>
+      )}
+    </div>
+  );
+}
+
+async function downloadPDF(rows) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+
+  // Header
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.setTextColor(28, 40, 22);
+  doc.text("Lead Report", 40, 50);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(120, 120, 120);
+  doc.text("WeFence — Ocala, FL", 40, 68);
+  doc.text("Generated " + fmtDateLong(new Date().toISOString()), 40, 82);
+  doc.text(rows.length + " " + (rows.length === 1 ? "contact" : "contacts"), 40, 96);
+
+  doc.setDrawColor(217, 154, 43);
+  doc.setLineWidth(1.2);
+  doc.line(40, 104, doc.internal.pageSize.width - 40, 104);
+
+  doc.autoTable({
+    startY: 118,
+    head: [["Date", "Name", "Phone", "Email", "AI Call Summary"]],
+    body: rows.map((l) => [
+      fmtDate(l.created_at),
+      l.name || "—",
+      l.phone || "—",
+      l.email || "—",
+      summaryText(l) || "No call yet",
+    ]),
+    headStyles: {
+      fillColor: [44, 59, 38],
+      textColor: 244,
+      fontStyle: "bold",
+      fontSize: 9,
+    },
+    bodyStyles: {
+      fontSize: 9,
+      textColor: [40, 45, 32],
+      valign: "top",
+    },
+    alternateRowStyles: { fillColor: [250, 247, 239] },
+    columnStyles: {
+      0: { cellWidth: 72 },
+      1: { cellWidth: 120 },
+      2: { cellWidth: 95 },
+      3: { cellWidth: 150 },
+      4: { cellWidth: "auto" },
+    },
+    margin: { left: 40, right: 40 },
+    tableLineColor: [225, 220, 200],
+    tableLineWidth: 0.4,
+  });
+
+  doc.save("wefence-leads-" + Date.now() + ".pdf");
+}
 
 function Login({ onAuth }) {
   const [email, setEmail] = useState("");
@@ -378,7 +541,7 @@ function Login({ onAuth }) {
           <span>WeFence</span>
         </div>
         <h1>Client <em>portal</em></h1>
-        <p className="lead">Sign in to view leads and estimates submitted from your website.</p>
+        <p className="lead">Sign in to view leads and call transcripts from your website.</p>
         <div className="field">
           <label>Email</label>
           <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="admin@we-fence.com" autoComplete="username" />
@@ -399,15 +562,17 @@ function Login({ onAuth }) {
 
 function Dashboard({ session, onSignOut }) {
   const [leads, setLeads] = useState(null); // null = loading
-  const [filter, setFilter] = useState("all");
   const [error, setError] = useState(null);
+  const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState(new Set());
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
       .from("wefence_leads")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(500);
+      .limit(1000);
     if (error) {
       setError(error.message);
       setLeads([]);
@@ -418,47 +583,59 @@ function Dashboard({ session, onSignOut }) {
 
   useEffect(() => { load(); }, [load]);
 
-  // Subscribe to live inserts
+  // Realtime: live new leads + transcript updates
   useEffect(() => {
     const channel = supabase
       .channel("wefence_leads_changes")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "wefence_leads" }, (payload) => {
-        setLeads(curr => curr ? [payload.new, ...curr] : [payload.new]);
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "wefence_leads" }, (p) => {
+        setLeads(curr => curr ? [p.new, ...curr] : [p.new]);
       })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "wefence_leads" }, (payload) => {
-        setLeads(curr => curr ? curr.map(l => l.id === payload.new.id ? payload.new : l) : curr);
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "wefence_leads" }, (p) => {
+        setLeads(curr => curr ? curr.map(l => l.id === p.new.id ? p.new : l) : curr);
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const updateStatus = async (id, status) => {
-    setLeads(curr => curr.map(l => l.id === id ? { ...l, status } : l));
-    const { error } = await supabase.from("wefence_leads").update({ status }).eq("id", id);
-    if (error) {
-      console.error(error);
-      load();
-    }
+  const totalPages = leads ? Math.max(1, Math.ceil(leads.length / pageSize)) : 1;
+  const start = (page - 1) * pageSize;
+  const paginated = useMemo(() => (leads || []).slice(start, start + pageSize), [leads, start, pageSize]);
+
+  // Reset to page 1 if data changes and current page goes empty
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [page, totalPages]);
+
+  const allOnPageSelected = paginated.length > 0 && paginated.every(o => selected.has(o.id));
+  const someOnPageSelected = paginated.some(o => selected.has(o.id)) && !allOnPageSelected;
+
+  const headerCheckRef = useRef(null);
+  useEffect(() => {
+    if (headerCheckRef.current) headerCheckRef.current.indeterminate = someOnPageSelected;
+  }, [someOnPageSelected]);
+
+  const toggleAll = () => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (allOnPageSelected) paginated.forEach(o => next.delete(o.id));
+      else paginated.forEach(o => next.add(o.id));
+      return next;
+    });
+  };
+  const toggleOne = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
   };
 
-  const counts = useMemo(() => {
-    const c = { total: 0, new: 0, week: 0, won: 0 };
-    if (!leads) return c;
-    const weekAgo = Date.now() - 7 * 86400000;
-    for (const l of leads) {
-      c.total++;
-      if (l.status === "new") c.new++;
-      if (l.status === "won") c.won++;
-      if (new Date(l.created_at).getTime() > weekAgo) c.week++;
-    }
-    return c;
-  }, [leads]);
+  const selectedRows = useMemo(
+    () => (leads || []).filter(l => selected.has(l.id)),
+    [leads, selected]
+  );
 
-  const filtered = useMemo(() => {
-    if (!leads) return [];
-    if (filter === "all") return leads;
-    return leads.filter(l => l.status === filter);
-  }, [leads, filter]);
+  const handleDownload = () => downloadPDF(selectedRows);
 
   return (
     <>
@@ -480,106 +657,129 @@ function Dashboard({ session, onSignOut }) {
         <div className="panel-head">
           <div>
             <div className="label">Lead inbox</div>
-            <h2>Your <em>website leads</em>, in one place.</h2>
+            <h2>
+              Contacts
+              {leads && leads.length > 0 && <span className="count-pill">{leads.length}</span>}
+            </h2>
+            <div className="sub">Leads &amp; AI call transcripts from we-fence.com</div>
           </div>
         </div>
 
-        <div className="stats">
-          <div className="stat-card accent">
-            <span className="k mono">{counts.new}</span>
-            <span className="l">New leads</span>
+        {selected.size > 0 && (
+          <div className="action-bar">
+            <div className="info">
+              <span className="dot" />
+              {selected.size} {selected.size === 1 ? "contact" : "contacts"} selected
+            </div>
+            <button className="btn-download" onClick={handleDownload}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download PDF
+            </button>
           </div>
-          <div className="stat-card">
-            <span className="k mono">{counts.week}</span>
-            <span className="l">Last 7 days</span>
-          </div>
-          <div className="stat-card">
-            <span className="k mono">{counts.won}</span>
-            <span className="l">Closed/won</span>
-          </div>
-          <div className="stat-card">
-            <span className="k mono">{counts.total}</span>
-            <span className="l">Total</span>
-          </div>
-        </div>
-
-        <div className="toolbar">
-          <button className={`filter-pill ${filter === "all" ? "on" : ""}`} onClick={() => setFilter("all")}>All</button>
-          {STATUS_OPTIONS.map(o => (
-            <button key={o.id} className={`filter-pill ${filter === o.id ? "on" : ""}`} onClick={() => setFilter(o.id)}>{o.label}</button>
-          ))}
-          <span className="spacer" />
-          <span className="meta">{filtered.length} {filtered.length === 1 ? "lead" : "leads"}</span>
-        </div>
+        )}
 
         {error && <div className="err" style={{ marginBottom: 16 }}>{error}</div>}
 
         {leads === null ? (
-          <div className="leads"><div className="loading">Loading leads</div></div>
-        ) : filtered.length === 0 ? (
-          <div className="leads">
-            <div className="empty">
-              <div className="ico">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-              </div>
-              <h3>{leads.length === 0 ? "No leads yet" : "No leads in this filter"}</h3>
-              <p>{leads.length === 0
-                ? "When someone submits the estimate form on we-fence.com, it'll show up here in real time."
-                : "Try a different status filter."}</p>
+          <div>
+            <div className="skeleton" />
+            <div className="skeleton" />
+            <div className="skeleton" />
+            <div className="skeleton" />
+          </div>
+        ) : leads.length === 0 ? (
+          <div className="empty">
+            <div className="ico">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
             </div>
+            <h3>No contacts yet</h3>
+            <p>Leads from your website &amp; AI voice calls will appear here automatically, in real time.</p>
           </div>
         ) : (
-          <div className="leads">
-            <div className="leads-head">
-              <div>When</div>
-              <div>Lead</div>
-              <div>Contact</div>
-              <div>Job</div>
-              <div>Estimate</div>
-              <div>Status</div>
+          <>
+            <div className="table-wrap">
+              <table className="leads">
+                <thead>
+                  <tr>
+                    <th className="checkbox-col">
+                      <input
+                        type="checkbox"
+                        ref={headerCheckRef}
+                        className="checkbox"
+                        checked={allOnPageSelected}
+                        onChange={toggleAll}
+                        aria-label="Select all on page"
+                      />
+                    </th>
+                    <th style={{ width: "32%" }}>Contact</th>
+                    <th>AI Call Summary</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map(l => {
+                    const isSel = selected.has(l.id);
+                    return (
+                      <tr key={l.id} className={isSel ? "selected" : ""}>
+                        <td className="checkbox-cell">
+                          <input
+                            type="checkbox"
+                            className="checkbox"
+                            checked={isSel}
+                            onChange={() => toggleOne(l.id)}
+                            aria-label={`Select ${l.name}`}
+                          />
+                        </td>
+                        <td>
+                          <div className="c-date">{fmtDate(l.created_at)}</div>
+                          <div className="c-name">
+                            {l.name || "—"}
+                            {l.language && l.language !== "en" && <span className="badge-lang">{l.language}</span>}
+                          </div>
+                          <div className="c-contact">
+                            {l.phone && <a href={`tel:${l.phone.replace(/\D/g, "")}`}>{l.phone}</a>}
+                            {l.email && <a className="em" href={`mailto:${l.email}`}>{l.email}</a>}
+                          </div>
+                        </td>
+                        <td>
+                          <CallSummaryCell lead={l} />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-            {filtered.map(l => (
-              <div key={l.id} className="lead-row">
-                <div className="when" title={new Date(l.created_at).toLocaleString()}>{fmtDate(l.created_at)}</div>
-                <div className="name">
-                  {l.name}
-                  {l.language && l.language !== "en" && <span className="lang">{l.language}</span>}
-                </div>
-                <div className="contact">
-                  {l.phone && <div><a href={`tel:${l.phone.replace(/\D/g, "")}`}>{l.phone}</a></div>}
-                  {l.email && <div><a href={`mailto:${l.email}`}>{l.email}</a></div>}
-                </div>
-                <div className="what">
-                  {l.material && <span className="badge">{MATERIAL_LABELS[l.material] || l.material}</span>}
-                  {l.feet && <span className="badge">{l.feet} ft</span>}
-                  {l.has_gate && <span className="badge">+ gate</span>}
-                  {l.about && <div style={{ marginTop: 4 }}>{l.about}</div>}
-                </div>
-                <div className="est">
-                  {(l.estimate_low || l.estimate_high) ? (
-                    <>
-                      <span className="range">{fmt$(l.estimate_low)} – {fmt$(l.estimate_high)}</span>
-                      <span className="ftrate">auto-calc</span>
-                    </>
-                  ) : <span style={{ color: "#8a8e7c" }}>—</span>}
-                </div>
-                <div>
-                  <select
-                    className={`status-select status-${l.status}`}
-                    value={l.status}
-                    onChange={(e) => updateStatus(l.id, e.target.value)}
-                  >
-                    {STATUS_OPTIONS.map(o => (
-                      <option key={o.id} value={o.id}>{o.label}</option>
-                    ))}
-                  </select>
+
+            <div className="pager">
+              <div className="left">
+                <span>Rows per page</span>
+                <div className="page-size">
+                  {PAGE_SIZE_OPTIONS.map(s => (
+                    <button key={s} className={pageSize === s ? "on" : ""} onClick={() => { setPageSize(s); setPage(1); }}>{s}</button>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="right">
+                <span>{leads.length === 0 ? 0 : start + 1}–{Math.min(start + pageSize, leads.length)} of {leads.length}</span>
+                <div className="page-nav">
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} aria-label="Previous">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <span className="info">{page} / {totalPages}</span>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} aria-label="Next">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </>
@@ -607,7 +807,7 @@ function App() {
   };
 
   if (bootstrapping) {
-    return <div className="login-wrap"><div className="loading">Loading</div></div>;
+    return <div className="login-wrap"><div style={{ fontFamily: "'Geist Mono', monospace", fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "#6b6f5e" }}>Loading…</div></div>;
   }
 
   return session
