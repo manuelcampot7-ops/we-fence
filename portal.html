@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WeFence — Client Portal</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --ink: #12160F;
+    --ink-2: #1E241B;
+    --cream: #F4EFE4;
+    --cream-2: #EBE5D6;
+    --paper: #FAF7EF;
+    --forest: #2C3B26;
+    --forest-deep: #1B2517;
+    --moss: #4A6B3A;
+    --amber: #D99A2B;
+    --amber-soft: #E8B24A;
+    --rust: #A64B2A;
+    --line: rgba(18,22,15,0.12);
+    --line-soft: rgba(18,22,15,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01","cv11";
+    min-height: 100vh;
+  }
+  .serif { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -0.01em; }
+  .mono { font-family: 'Geist Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+
+  /* HEADER */
+  .nav {
+    background: var(--forest-deep); color: var(--cream);
+    border-bottom: 1px solid rgba(244,239,228,0.08);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; font-size: 18px; }
+  .logo-mark {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: var(--cream);
+    display: grid; place-items: center; color: var(--forest-deep);
+    font-family: 'Instrument Serif', serif; font-size: 20px; font-style: italic;
+    position: relative; overflow: hidden;
+  }
+  .logo-mark::after {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 4px, rgba(28,40,22,0.18) 4px 5px);
+  }
+  .nav-meta { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #cfc8b4; }
+  .nav-meta .pill {
+    padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(244,239,228,0.18);
+    font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    border: 1px solid rgba(244,239,228,0.25); background: transparent; color: var(--cream);
+    text-decoration: none; transition: all .2s ease;
+  }
+  .btn:hover { background: rgba(244,239,228,0.08); border-color: var(--cream); }
+  .btn.amber { background: var(--amber); border-color: var(--amber); color: #231a05; }
+  .btn.amber:hover { background: var(--amber-soft); border-color: var(--amber-soft); }
+  .btn.dark { background: var(--ink); border-color: var(--ink); color: var(--cream); }
+
+  /* LOGIN */
+  .login-wrap {
+    min-height: 100vh; display: grid; place-items: center;
+    background: var(--paper);
+    background-image:
+      radial-gradient(900px 500px at 20% -10%, rgba(217,154,43,0.12), transparent 60%),
+      radial-gradient(900px 500px at 100% 110%, rgba(74,107,58,0.18), transparent 60%);
+    padding: 32px 16px;
+  }
+  .login-card {
+    width: 100%; max-width: 420px;
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 22px; padding: 36px 32px;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.18);
+  }
+  .login-card .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 600; font-size: 18px; margin-bottom: 4px;
+  }
+  .login-card .brand .logo-mark {
+    background: var(--forest); color: var(--cream);
+  }
+  .login-card h1 {
+    font-family: 'Instrument Serif', serif; font-size: 38px;
+    line-height: 1.05; letter-spacing: -0.02em;
+    margin: 18px 0 8px; font-weight: 400;
+  }
+  .login-card h1 em { font-style: italic; color: var(--amber); }
+  .login-card .lead { color: #4a4f41; font-size: 14px; margin-bottom: 22px; line-height: 1.5; }
+  .field { display: grid; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 12px; color: #4a4f41; font-weight: 500; }
+  .field input {
+    width: 100%; border: 1px solid rgba(18,22,15,0.18); background: var(--paper);
+    border-radius: 10px; padding: 12px 14px; font: inherit; color: inherit;
+    outline: none; transition: border-color .15s ease;
+  }
+  .field input:focus { border-color: var(--ink); }
+  .login-card .btn-submit {
+    width: 100%; justify-content: center;
+    background: var(--ink); color: var(--cream); border-color: var(--ink);
+    padding: 13px 16px; font-size: 14px; margin-top: 6px;
+  }
+  .login-card .btn-submit:hover { background: var(--forest-deep); border-color: var(--forest-deep); }
+  .login-card .btn-submit:disabled { opacity: 0.6; cursor: wait; }
+  .err {
+    margin-top: 14px; padding: 10px 12px; border-radius: 10px;
+    background: rgba(166,75,42,0.1); border: 1px solid rgba(166,75,42,0.3);
+    color: #8c3818; font-size: 13px;
+  }
+  .login-foot {
+    margin-top: 20px; text-align: center; font-size: 11px; color: #8a8e7c;
+    font-family: 'Geist Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* DASHBOARD */
+  .panel {
+    padding: 36px 0;
+  }
+  .panel-head {
+    display: flex; align-items: end; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap; margin-bottom: 24px;
+  }
+  .panel-head .label {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6b6f5e; margin-bottom: 4px;
+  }
+  .panel-head h2 {
+    font-family: 'Instrument Serif', serif; font-size: clamp(36px, 4vw, 52px);
+    line-height: 1.02; letter-spacing: -0.01em; margin: 0; font-weight: 400;
+  }
+  .panel-head h2 em { font-style: italic; color: var(--moss); }
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 20px;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -18px rgba(0,0,0,0.18); }
+  .stat-card .k {
+    font-family: 'Instrument Serif', serif; font-size: 38px; line-height: 1;
+    letter-spacing: -0.02em; display: block;
+  }
+  .stat-card .l {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #6b6f5e; margin-top: 6px;
+  }
+  .stat-card.accent .k { color: var(--amber); }
+
+  .toolbar {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .filter-pill {
+    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line);
+    background: #fff; color: #4a4f41;
+    font-size: 12px; font-family: 'Geist Mono', monospace;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    transition: all .15s ease;
+  }
+  .filter-pill:hover { border-color: var(--ink); }
+  .filter-pill.on { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .meta { font-size: 11px; color: #8a8e7c; align-self: center; font-family: 'Geist Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* LEADS */
+  .leads {
+    background: #fff; border: 1px solid var(--line); border-radius: 18px;
+    overflow: hidden;
+  }
+  .leads-head {
+    display: grid;
+    grid-template-columns: 110px 1.2fr 1fr 0.9fr 1fr 130px;
+    gap: 14px; padding: 14px 22px;
+    background: var(--cream); border-bottom: 1px solid var(--line);
+    font-family: 'Geist Mono', monospace; font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: #6b6f5e;
+  }
+  .lead-row {
+    display: grid;
+    grid-template-columns: 110px 1.2fr 1fr 0.9fr 1fr 130px;
+    gap: 14px; padding: 18px 22px;
+    border-bottom: 1px solid var(--line-soft);
+    align-items: center; font-size: 14px;
+    transition: background .15s ease;
+  }
+  .lead-row:last-child { border-bottom: 0; }
+  .lead-row:hover { background: var(--paper); }
+  .lead-row .when { font-family: 'Geist Mono', monospace; font-size: 12px; color: #6b6f5e; }
+  .lead-row .name {
+    font-family: 'Instrument Serif', serif; font-size: 20px; line-height: 1.1; letter-spacing: -0.01em;
+  }
+  .lead-row .name .lang {
+    font-family: 'Geist Mono', monospace; font-size: 9px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: #8a8e7c; padding: 2px 6px;
+    border: 1px solid var(--line); border-radius: 999px; margin-left: 8px;
+    display: inline-block; vertical-align: middle;
+  }
+  .lead-row .contact { font-size: 13px; line-height: 1.5; }
+  .lead-row .contact a { color: var(--forest); text-decoration: none; }
+  .lead-row .contact a:hover { color: var(--ink); text-decoration: underline; }
+  .lead-row .what { font-size: 13px; color: #4a4f41; line-height: 1.4; }
+  .lead-row .what .badge {
+    display: inline-block; font-family: 'Geist Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--forest);
+    background: var(--cream-2); padding: 2px 7px; border-radius: 999px;
+    margin-right: 6px; margin-bottom: 4px;
+  }
+  .lead-row .est {
+    font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--ink);
+  }
+  .lead-row .est .range { display: block; }
+  .lead-row .est .ftrate { font-size: 10px; color: #8a8e7c; margin-top: 2px; }
+
+  .status-select {
+    padding: 6px 10px; border-radius: 999px;
+    border: 1px solid var(--line); background: #fff;
+    font: inherit; font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink);
+    cursor: pointer; outline: none; appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3e%3cpath d='M1 1l4 4 4-4' stroke='%236b6f5e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-repeat: no-repeat; background-position: right 10px center;
+    padding-right: 26px;
+  }
+  .status-new { background-color: rgba(217,154,43,0.12); color: #8c5a13; border-color: rgba(217,154,43,0.4); }
+  .status-contacted { background-color: rgba(74,107,58,0.12); color: var(--forest); border-color: rgba(74,107,58,0.4); }
+  .status-scheduled { background-color: rgba(40,80,180,0.1); color: #1f4488; border-color: rgba(40,80,180,0.35); }
+  .status-won { background-color: rgba(40,140,60,0.14); color: #1f6638; border-color: rgba(40,140,60,0.35); }
+  .status-lost { background-color: rgba(120,120,120,0.12); color: #555; border-color: rgba(120,120,120,0.3); }
+
+  .empty {
+    padding: 80px 24px; text-align: center;
+  }
+  .empty .ico {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--cream); display: grid; place-items: center;
+    margin: 0 auto 16px; color: var(--moss);
+  }
+  .empty h3 {
+    font-family: 'Instrument Serif', serif; font-size: 28px; margin: 0 0 6px;
+    letter-spacing: -0.01em; font-weight: 400;
+  }
+  .empty p { color: #6b6f5e; font-size: 14px; margin: 0; max-width: 360px; margin: 0 auto; line-height: 1.55; }
+
+  .loading {
+    padding: 80px 24px; text-align: center; color: #6b6f5e;
+    font-family: 'Geist Mono', monospace; font-size: 12px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .loading::after {
+    content: ''; display: inline-block; width: 6px; animation: dots 1.4s steps(4, end) infinite;
+  }
+  @keyframes dots {
+    0%, 100% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 960px) {
+    .container { padding: 0 18px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .leads-head { display: none; }
+    .lead-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 18px 18px;
+    }
+    .lead-row > div { display: block; }
+    .lead-row .name { font-size: 22px; }
+    .lead-row .est { padding-top: 4px; border-top: 1px solid var(--line-soft); }
+  }
+  @media (max-width: 560px) {
+    .panel-head h2 { font-size: 30px; }
+    .stat-card .k { font-size: 30px; }
+    .login-card { padding: 28px 22px; }
+    .login-card h1 { font-size: 30px; }
+    .nav-meta .greeting { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+  window.__SUPABASE__ = {
+    url: "https://eawdbpddgkqkudhqmsti.supabase.co",
+    anonKey: "sb_publishable_aGKvEp7C39W3jQmvh-yf_w_xYg9G_eT"
+  };
+</script>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect, useMemo, useCallback } = React;
+
+const supabase = window.supabase.createClient(
+  window.__SUPABASE__.url,
+  window.__SUPABASE__.anonKey,
+  { auth: { persistSession: true, autoRefreshToken: true } }
+);
+
+const STATUS_OPTIONS = [
+  { id: "new",       label: "New" },
+  { id: "contacted", label: "Contacted" },
+  { id: "scheduled", label: "Scheduled" },
+  { id: "won",       label: "Won" },
+  { id: "lost",      label: "Lost" },
+];
+
+const MATERIAL_LABELS = {
+  vinyl: "Vinyl",
+  wood: "Wood",
+  aluminum: "Aluminum",
+  chain: "Chain-link",
+};
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMin = Math.floor((now - d) / 60000);
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return diffMin + "m ago";
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return diffH + "h ago";
+  const diffD = Math.floor(diffH / 24);
+  if (diffD < 7) return diffD + "d ago";
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+const fmt$ = n => "$" + Number(n || 0).toLocaleString();
+
+function Login({ onAuth }) {
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setErr(null);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    setBusy(false);
+    if (error) setErr(error.message);
+    else if (data.session) onAuth(data.session);
+  };
+
+  return (
+    <div className="login-wrap">
+      <form className="login-card" onSubmit={submit}>
+        <div className="brand">
+          <div className="logo-mark">W</div>
+          <span>WeFence</span>
+        </div>
+        <h1>Client <em>portal</em></h1>
+        <p className="lead">Sign in to view leads and estimates submitted from your website.</p>
+        <div className="field">
+          <label>Email</label>
+          <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="admin@we-fence.com" autoComplete="username" />
+        </div>
+        <div className="field">
+          <label>Password</label>
+          <input type="password" required value={pw} onChange={e => setPw(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
+        </div>
+        <button type="submit" className="btn btn-submit" disabled={busy}>
+          {busy ? "Signing in…" : "Sign in →"}
+        </button>
+        {err && <div className="err">{err}</div>}
+        <div className="login-foot">PRIVATE · WE FENCE LLC · OCALA, FL</div>
+      </form>
+    </div>
+  );
+}
+
+function Dashboard({ session, onSignOut }) {
+  const [leads, setLeads] = useState(null); // null = loading
+  const [filter, setFilter] = useState("all");
+  const [error, setError] = useState(null);
+
+  const load = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("wefence_leads")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) {
+      setError(error.message);
+      setLeads([]);
+      return;
+    }
+    setLeads(data || []);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  // Subscribe to live inserts
+  useEffect(() => {
+    const channel = supabase
+      .channel("wefence_leads_changes")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "wefence_leads" }, (payload) => {
+        setLeads(curr => curr ? [payload.new, ...curr] : [payload.new]);
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "wefence_leads" }, (payload) => {
+        setLeads(curr => curr ? curr.map(l => l.id === payload.new.id ? payload.new : l) : curr);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const updateStatus = async (id, status) => {
+    setLeads(curr => curr.map(l => l.id === id ? { ...l, status } : l));
+    const { error } = await supabase.from("wefence_leads").update({ status }).eq("id", id);
+    if (error) {
+      console.error(error);
+      load();
+    }
+  };
+
+  const counts = useMemo(() => {
+    const c = { total: 0, new: 0, week: 0, won: 0 };
+    if (!leads) return c;
+    const weekAgo = Date.now() - 7 * 86400000;
+    for (const l of leads) {
+      c.total++;
+      if (l.status === "new") c.new++;
+      if (l.status === "won") c.won++;
+      if (new Date(l.created_at).getTime() > weekAgo) c.week++;
+    }
+    return c;
+  }, [leads]);
+
+  const filtered = useMemo(() => {
+    if (!leads) return [];
+    if (filter === "all") return leads;
+    return leads.filter(l => l.status === filter);
+  }, [leads, filter]);
+
+  return (
+    <>
+      <div className="nav">
+        <div className="container nav-inner">
+          <div className="logo">
+            <div className="logo-mark">W</div>
+            <span>WeFence <span style={{ color: "#8a8e7c", fontWeight: 400, marginLeft: 6 }}>· Portal</span></span>
+          </div>
+          <div className="nav-meta">
+            <span className="pill">LIVE</span>
+            <span className="greeting">Signed in as {session.user.email}</span>
+            <button className="btn" onClick={onSignOut}>Sign out</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="container panel">
+        <div className="panel-head">
+          <div>
+            <div className="label">Lead inbox</div>
+            <h2>Your <em>website leads</em>, in one place.</h2>
+          </div>
+        </div>
+
+        <div className="stats">
+          <div className="stat-card accent">
+            <span className="k mono">{counts.new}</span>
+            <span className="l">New leads</span>
+          </div>
+          <div className="stat-card">
+            <span className="k mono">{counts.week}</span>
+            <span className="l">Last 7 days</span>
+          </div>
+          <div className="stat-card">
+            <span className="k mono">{counts.won}</span>
+            <span className="l">Closed/won</span>
+          </div>
+          <div className="stat-card">
+            <span className="k mono">{counts.total}</span>
+            <span className="l">Total</span>
+          </div>
+        </div>
+
+        <div className="toolbar">
+          <button className={`filter-pill ${filter === "all" ? "on" : ""}`} onClick={() => setFilter("all")}>All</button>
+          {STATUS_OPTIONS.map(o => (
+            <button key={o.id} className={`filter-pill ${filter === o.id ? "on" : ""}`} onClick={() => setFilter(o.id)}>{o.label}</button>
+          ))}
+          <span className="spacer" />
+          <span className="meta">{filtered.length} {filtered.length === 1 ? "lead" : "leads"}</span>
+        </div>
+
+        {error && <div className="err" style={{ marginBottom: 16 }}>{error}</div>}
+
+        {leads === null ? (
+          <div className="leads"><div className="loading">Loading leads</div></div>
+        ) : filtered.length === 0 ? (
+          <div className="leads">
+            <div className="empty">
+              <div className="ico">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+              </div>
+              <h3>{leads.length === 0 ? "No leads yet" : "No leads in this filter"}</h3>
+              <p>{leads.length === 0
+                ? "When someone submits the estimate form on we-fence.com, it'll show up here in real time."
+                : "Try a different status filter."}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="leads">
+            <div className="leads-head">
+              <div>When</div>
+              <div>Lead</div>
+              <div>Contact</div>
+              <div>Job</div>
+              <div>Estimate</div>
+              <div>Status</div>
+            </div>
+            {filtered.map(l => (
+              <div key={l.id} className="lead-row">
+                <div className="when" title={new Date(l.created_at).toLocaleString()}>{fmtDate(l.created_at)}</div>
+                <div className="name">
+                  {l.name}
+                  {l.language && l.language !== "en" && <span className="lang">{l.language}</span>}
+                </div>
+                <div className="contact">
+                  {l.phone && <div><a href={`tel:${l.phone.replace(/\D/g, "")}`}>{l.phone}</a></div>}
+                  {l.email && <div><a href={`mailto:${l.email}`}>{l.email}</a></div>}
+                </div>
+                <div className="what">
+                  {l.material && <span className="badge">{MATERIAL_LABELS[l.material] || l.material}</span>}
+                  {l.feet && <span className="badge">{l.feet} ft</span>}
+                  {l.has_gate && <span className="badge">+ gate</span>}
+                  {l.about && <div style={{ marginTop: 4 }}>{l.about}</div>}
+                </div>
+                <div className="est">
+                  {(l.estimate_low || l.estimate_high) ? (
+                    <>
+                      <span className="range">{fmt$(l.estimate_low)} – {fmt$(l.estimate_high)}</span>
+                      <span className="ftrate">auto-calc</span>
+                    </>
+                  ) : <span style={{ color: "#8a8e7c" }}>—</span>}
+                </div>
+                <div>
+                  <select
+                    className={`status-select status-${l.status}`}
+                    value={l.status}
+                    onChange={(e) => updateStatus(l.id, e.target.value)}
+                  >
+                    {STATUS_OPTIONS.map(o => (
+                      <option key={o.id} value={o.id}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function App() {
+  const [session, setSession] = useState(null);
+  const [bootstrapping, setBootstrapping] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setBootstrapping(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+  };
+
+  if (bootstrapping) {
+    return <div className="login-wrap"><div className="loading">Loading</div></div>;
+  }
+
+  return session
+    ? <Dashboard session={session} onSignOut={signOut} />
+    : <Login onAuth={setSession} />;
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+</script>
+</body>
+</html>

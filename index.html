@@ -12,6 +12,7 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/livekit-client@1.15.4/dist/livekit-client.umd.min.js" defer crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
 <style>
   :root {
     --ink: #12160F;
@@ -866,6 +867,10 @@
     "phone": "(352) 555-0199",
     "email": "hello@we-fence.com"
   };
+  window.__SUPABASE__ = {
+    url: "https://eawdbpddgkqkudhqmsti.supabase.co",
+    anonKey: "sb_publishable_aGKvEp7C39W3jQmvh-yf_w_xYg9G_eT"
+  };
 </script>
 
 <div id="app"></div>
@@ -1179,19 +1184,30 @@ function CountUp({ value, duration = 1600 }) {
   return <span ref={ref}>{shown}{suffix}</span>;
 }
 
-function Calculator({ t, tweaks }) {
-  const [feet, setFeet] = useState(150);
-  const [matId, setMatId] = useState("vinyl");
-  const [gate, setGate] = useState(true);
-  const numRef = useRef(null);
-  const prevRange = useRef("");
-
-  const mat = t.calc.materials.find(m => m.id === matId);
+function computeEstimate(t, tweaks, feet, matId, gate) {
+  const mat = t.calc.materials.find(m => m.id === matId) || t.calc.materials[0];
   const base = feet * tweaks.pricePerFoot * mat.mult;
   const gateCost = gate ? tweaks.gatePrice : 0;
   const total = Math.round(base + gateCost);
-  const low = Math.round(total * 0.94);
-  const high = Math.round(total * 1.08);
+  return {
+    mat,
+    base,
+    gateCost,
+    total,
+    low: Math.round(total * 0.94),
+    high: Math.round(total * 1.08),
+  };
+}
+
+function Calculator({ t, tweaks, calc, setCalc }) {
+  const { feet, matId, gate } = calc;
+  const setFeet = (v) => setCalc(c => ({ ...c, feet: v }));
+  const setMatId = (v) => setCalc(c => ({ ...c, matId: v }));
+  const setGate = (v) => setCalc(c => ({ ...c, gate: v }));
+  const numRef = useRef(null);
+  const prevRange = useRef("");
+
+  const { mat, base, gateCost, total, low, high } = computeEstimate(t, tweaks, feet, matId, gate);
 
   const fmt = n => "$" + n.toLocaleString();
 
@@ -1514,7 +1530,60 @@ function App() {
   const [tweaks] = useState(window.__TWEAKS__);
   const [lang, setLang] = useState(tweaks.defaultLanguage || "en");
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [calc, setCalc] = useState({ feet: 150, matId: "vinyl", gate: true });
   const t = T[lang];
+
+  const supabase = useMemo(() => {
+    if (typeof window === "undefined" || !window.supabase || !window.__SUPABASE__) return null;
+    return window.supabase.createClient(window.__SUPABASE__.url, window.__SUPABASE__.anonKey);
+  }, []);
+
+  const submitLead = async (e) => {
+    e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const fd = new FormData(e.target);
+    const est = computeEstimate(t, tweaks, calc.feet, calc.matId, calc.gate);
+    const payload = {
+      name: (fd.get("name") || "").toString().trim(),
+      phone: (fd.get("phone") || "").toString().trim(),
+      email: (fd.get("email") || "").toString().trim() || null,
+      about: (fd.get("about") || "").toString().trim() || null,
+      feet: calc.feet,
+      material: calc.matId,
+      has_gate: calc.gate,
+      estimate_low: est.low,
+      estimate_high: est.high,
+      language: lang,
+      source: "website",
+      status: "new",
+    };
+
+    if (!payload.name || !payload.phone) {
+      setSubmitError(lang === "es" ? "Faltan nombre y teléfono." : "Name and phone required.");
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      if (!supabase) throw new Error("Supabase not loaded");
+      const { error } = await supabase.from("wefence_leads").insert(payload);
+      if (error) throw error;
+      setSent(true);
+    } catch (err) {
+      console.error("Lead submit failed:", err);
+      setSubmitError(
+        (lang === "es" ? "Error al enviar: " : "Submit failed: ") +
+          (err.message || "unknown")
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Scroll reveal via IntersectionObserver
   useEffect(() => {
@@ -1673,7 +1742,7 @@ function App() {
             </div>
           </div>
           <div id="estimator" className="reveal-scale d2">
-            <Calculator t={t} tweaks={tweaks} />
+            <Calculator t={t} tweaks={tweaks} calc={calc} setCalc={setCalc} />
           </div>
         </div>
       </header>
@@ -1844,7 +1913,7 @@ function App() {
                 </div>
               </div>
             </div>
-            <form className="lead-form" onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
+            <form className="lead-form" onSubmit={submitLead}>
               {sent ? (
                 <div style={{ padding: 24, textAlign: "center" }}>
                   <div style={{ fontSize: 48, color: "var(--amber-soft)" }}>✓</div>
@@ -1854,23 +1923,30 @@ function App() {
                 <>
                   <div className="field">
                     <label>{t.leadcta.form.name}</label>
-                    <input type="text" required placeholder="Juan García" />
+                    <input type="text" name="name" required placeholder="Juan García" />
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                     <div className="field">
                       <label>{t.leadcta.form.phone}</label>
-                      <input type="tel" required placeholder="(352) 555-0199" />
+                      <input type="tel" name="phone" required placeholder="(352) 555-0199" />
                     </div>
                     <div className="field">
                       <label>{t.leadcta.form.email}</label>
-                      <input type="email" placeholder="you@email.com" />
+                      <input type="email" name="email" placeholder="you@email.com" />
                     </div>
                   </div>
                   <div className="field">
                     <label>{t.leadcta.form.about}</label>
-                    <input type="text" placeholder="150ft of vinyl privacy + 1 gate" />
+                    <input type="text" name="about" placeholder="150ft of vinyl privacy + 1 gate" />
                   </div>
-                  <button type="submit" className="btn">{t.leadcta.form.send} →</button>
+                  {submitError && (
+                    <div style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(166,75,42,0.18)", border: "1px solid rgba(166,75,42,0.4)", color: "#ffbfa8", fontSize: 12, marginBottom: 8 }}>
+                      {submitError}
+                    </div>
+                  )}
+                  <button type="submit" className="btn" disabled={submitting}>
+                    {submitting ? (lang === "es" ? "Enviando…" : "Sending…") : t.leadcta.form.send} {!submitting && "→"}
+                  </button>
                 </>
               )}
             </form>
@@ -1943,9 +2019,7 @@ function App() {
             <span>© 2026 We Fence LLC · FL License #CBC-0000000</span>
             <span className="mono">est. 2014 · Ocala, FL</span>
             <a
-              href="https://app.gohighlevel.com/v2/location/8IIJDyclaxysv6lPoKrD/opportunities/list"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/portal"
               className="mono client-portal"
               title={lang === "es" ? "Panel del cliente — ver leads" : "Client portal — view leads"}
             >
