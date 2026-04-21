@@ -204,9 +204,9 @@
   /* TABLE */
   .table-wrap {
     background: #fff; border: 1px solid var(--line); border-radius: 18px;
-    overflow: hidden; box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+    overflow-x: auto; box-shadow: 0 1px 8px rgba(0,0,0,0.04);
   }
-  table.leads { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.leads { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px; }
   table.leads thead tr { background: var(--cream); border-bottom: 1px solid var(--line); }
   table.leads th {
     text-align: left; padding: 13px 18px;
@@ -363,15 +363,13 @@
 
   /* RESPONSIVE */
   @media (max-width: 880px) {
-    .container { padding: 0 16px; }
-    table.leads thead { display: none; }
-    table.leads, table.leads tbody, table.leads tr, table.leads td { display: block; }
-    table.leads tr { border-bottom: 1px solid var(--line-soft); padding: 8px 4px; }
-    table.leads td { border-top: 0; padding: 8px 14px; }
-    table.leads td.checkbox-cell { padding-bottom: 0; }
     .nav-meta .greeting { display: none; }
     .panel-head h2 { font-size: 28px; }
     .pager { justify-content: center; }
+    table.leads th, table.leads td { padding: 12px 12px; }
+    .c-name { font-size: 18px; }
+    .summary-card { padding: 10px 12px; }
+    .summary-card .text { font-size: 13px; }
   }
   @media (max-width: 560px) {
     .login-card { padding: 28px 22px; }
