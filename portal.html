@@ -55,7 +55,10 @@
     display: flex; align-items: center; justify-content: space-between;
     height: 68px;
   }
-  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; font-size: 18px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; font-size: 18px; transition: opacity .15s ease; }
+  a.logo:hover { opacity: 0.8; }
+  a.logo:hover .logo-mark { transform: rotate(-4deg); }
+  .logo-mark { transition: transform .2s cubic-bezier(.22,1,.36,1); }
   .logo-mark {
     width: 30px; height: 30px; border-radius: 6px;
     background: var(--cream);
@@ -641,10 +644,10 @@ function Dashboard({ session, onSignOut }) {
     <>
       <div className="nav">
         <div className="container nav-inner">
-          <div className="logo">
+          <a href="/" className="logo" title="Back to we-fence.com" style={{ textDecoration: "none", color: "inherit" }}>
             <div className="logo-mark">W</div>
             <span>WeFence <span style={{ color: "#8a8e7c", fontWeight: 400, marginLeft: 6 }}>· Portal</span></span>
-          </div>
+          </a>
           <div className="nav-meta">
             <span className="pill">LIVE</span>
             <span className="greeting">Signed in as {session.user.email}</span>
